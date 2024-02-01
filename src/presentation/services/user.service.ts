@@ -2,6 +2,7 @@ import { JwtAdapter, bcryptAdapter } from "../../config"
 import { dbConnection } from "../../data"
 import { CustomErrors, RegisterUserDto, UserEntity } from "../../domain"
 import { LoginUserDto } from '../../domain/dtos/user/login-user.dto';
+import { UpdateUserDto } from '../../domain/dtos/user/update-user.dto';
 
 export class UserService{
 
@@ -38,7 +39,7 @@ export class UserService{
 
     }
 
-    public async loginUser( loginUserDto :LoginUserDto ){
+    public async loginUser( loginUserDto: LoginUserDto ){
 
         const db = await dbConnection
 
@@ -63,6 +64,32 @@ export class UserService{
             user:userEntity, 
             token
         }
+    }
+
+    public async updateUser( updateUserDto: UpdateUserDto ){
+        
+        const db = await dbConnection
+        
+        const { rows: [userFound], rowCount: existUser } = await db.query(`
+        update info_users
+        set first_name = $1, last_name = $2, username = $3, position = $4, secondary_positions = $5, email = $6, password = $7
+        where id = $8
+        returning id, username, first_name as "firstName", last_name as "lastName", email, position, secondary_positions as "secondPosition"
+        `, 
+        [updateUserDto.firstName, updateUserDto.lastName, updateUserDto.username, updateUserDto.position, updateUserDto.secondPosition, updateUserDto.email, updateUserDto.password, updateUserDto.id]    
+        )
+        
+        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+        
+        const { password, ...userEntity } = UserEntity.fromObject(userFound)
+
+        return {
+            user:userEntity
+        }
+    }
+
+    public async uploadProfilePhotoUser( userId: string, photo: string ){
+        throw new Error('Method not implemented')
     }
 
 }

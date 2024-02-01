@@ -15,6 +15,10 @@ export class UserRoutes{
         
         router.post('/login', controller.loginUser)
 
+        router.put('/update', controller.updateUser)
+
+        router.post('/uploadProfilePhoto', controller.uploadPofilePhotoUser)
+
         return router
     }
 

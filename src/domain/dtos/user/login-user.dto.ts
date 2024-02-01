@@ -1,5 +1,3 @@
-import { regularExps } from '../../../config';
-
 export class LoginUserDto{
     private constructor(
         public readonly username: string,

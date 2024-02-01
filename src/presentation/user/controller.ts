@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { CustomErrors, RegisterUserDto } from "../../domain";
 import { UserService } from '../services/user.service';
 import { LoginUserDto } from "../../domain/dtos/user/login-user.dto";
+import { UpdateUserDto } from "../../domain/dtos/user/update-user.dto";
 
 
 export class UserController{
@@ -44,6 +45,27 @@ export class UserController{
         .then( (data) => res.status(200).json(data) )
         .catch( (error) => this.handleError(error, res) )
 
+    }
+
+    updateUser = (req: Request, res: Response) =>{
+        const [ error, updateUserDto ] = UpdateUserDto.create(req.body)
+
+        if(error){
+            return res.status(400).json({message: error})
+        }
+
+        this.AuthService.updateUser( updateUserDto! )
+        .then( (data) => {
+            console.log("asd")
+            res.status(200).json(data)
+        } )
+        .catch( (error) => this.handleError(error, res) )
+
+    }
+
+    uploadPofilePhotoUser = (req: Request, res: Response) =>{
+        const { id, photo } = req.body
+        this.AuthService.uploadProfilePhotoUser(id, photo)
     }
 
 }
