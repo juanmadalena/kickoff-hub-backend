@@ -55,10 +55,7 @@ export class UserController{
         }
 
         this.AuthService.updateUser( updateUserDto! )
-        .then( (data) => {
-            console.log("asd")
-            res.status(200).json(data)
-        } )
+        .then( (data) => res.status(200).json(data))
         .catch( (error) => this.handleError(error, res) )
 
     }

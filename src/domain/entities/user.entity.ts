@@ -16,7 +16,6 @@ export class UserEntity{
     ){}
 
     static fromObject(object: {[key: string]: any}): UserEntity{
-        console.log("objectasdasd", object)
         const { id, firstName, lastName, username, email, position, secondPosition, password = null, photo = null } = object
 
         if(!id)  throw CustomErrors.badRequest('Invalid id')
