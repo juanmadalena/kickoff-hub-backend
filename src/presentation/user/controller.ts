@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { CustomErrors, RegisterUserDto } from "../../domain";
-import { AuthService } from '../services/auth.service';
-import { LoginUserDto } from "../../domain/dtos/auth/login-user.dto";
+import { UserService } from '../services/user.service';
+import { LoginUserDto } from "../../domain/dtos/user/login-user.dto";
 
 
-export class AuthController{
+export class UserController{
 
     constructor(
-        public readonly AuthService: AuthService
+        public readonly AuthService: UserService
     ){}
 
     private handleError = (error: unknown, res: Response ) => {

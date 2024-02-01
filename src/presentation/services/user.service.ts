@@ -1,9 +1,9 @@
 import { JwtAdapter, bcryptAdapter } from "../../config"
 import { dbConnection } from "../../data"
 import { CustomErrors, RegisterUserDto, UserEntity } from "../../domain"
-import { LoginUserDto } from '../../domain/dtos/auth/login-user.dto';
+import { LoginUserDto } from '../../domain/dtos/user/login-user.dto';
 
-export class AuthService{
+export class UserService{
 
     constructor(){}
 

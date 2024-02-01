@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { AuthController } from "./controller";
-import { AuthService } from '../services/auth.service';
+import { UserController } from "./controller";
+import { UserService } from '../services/user.service';
 
 
-export class AuthRoutes{
+export class UserRoutes{
 
     static get routes(): Router{
 
         const router = Router();
-        const authService = new AuthService()
-        const controller = new AuthController(authService)
+        const authService = new UserService()
+        const controller = new UserController(authService)
 
         router.post('/register', controller.registerUser)
         
