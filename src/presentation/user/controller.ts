@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { CustomErrors, RegisterUserDto } from "../../domain";
+import { RegisterUserDto, handleError } from "../../domain";
 import { UserService } from '../services/user.service';
-import { LoginUserDto } from "../../domain/dtos/user/login-user.dto";
-import { UpdateUserDto } from "../../domain/dtos/user/update-user.dto";
+import { LoginUserDto } from "../../domain";
+import { UpdateUserDto } from "../../domain";
 
 
 export class UserController{
@@ -10,14 +10,6 @@ export class UserController{
     constructor(
         public readonly AuthService: UserService
     ){}
-
-    private handleError = (error: unknown, res: Response ) => {
-        if ( error instanceof CustomErrors ) {
-          return res.status(error.statusCode).json({ error: error.message, input: error.input});
-        }
-    
-        return res.status(500).json({ error: 'Internal server error' })
-    } 
 
     registerUser = (req: Request, res: Response) =>{
     
@@ -29,7 +21,7 @@ export class UserController{
 
         this.AuthService.registerUser(registerUserDto!)
         .then( (data) => res.status(201).json({data}) )
-        .catch( (error) => this.handleError(error, res) )
+        .catch( (error) => handleError(error, res) )
 
     }
 
@@ -43,7 +35,7 @@ export class UserController{
 
         this.AuthService.loginUser(loginUserDto!)
         .then( (data) => res.status(200).json(data) )
-        .catch( (error) => this.handleError(error, res) )
+        .catch( (error) => handleError(error, res) )
 
     }
 
@@ -56,8 +48,13 @@ export class UserController{
 
         this.AuthService.updateUser( updateUserDto! )
         .then( (data) => res.status(200).json(data))
-        .catch( (error) => this.handleError(error, res) )
+        .catch( (error) => handleError(error, res) )
 
+    }
+
+    updateUserPassword = (req: Request, res: Response) =>{
+        const { id, password } = req.body
+        res.json({id, password})
     }
 
     uploadPofilePhotoUser = (req: Request, res: Response) =>{
