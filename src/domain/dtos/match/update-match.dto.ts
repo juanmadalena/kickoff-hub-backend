@@ -11,12 +11,13 @@ export class UpdateMatchDto{
         public readonly minPlayers: number,
         public readonly maxPlayers: number,
         public readonly price: number,
+        public readonly isPrivate: boolean,
     ){}
 
     
     static create(props: {[key:string]:any}): [string?, UpdateMatchDto?] {
         
-        const { id, date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price } = props
+        const { id, date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, isPrivate = false } = props
 
         //id
         if(!id) return ['Id is required']
@@ -48,6 +49,6 @@ export class UpdateMatchDto{
         // Price
         if(!price) return ['Price is required']
 
-        return [undefined, new UpdateMatchDto(id, date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price)]
+        return [undefined, new UpdateMatchDto(id, date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, isPrivate)]
     }
 }

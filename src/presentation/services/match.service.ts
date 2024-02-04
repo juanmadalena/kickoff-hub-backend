@@ -1,6 +1,8 @@
 import { dbConnection } from "../../data";
 import { MatchEntity, UserEntity, CreateMatchDto } from '../../domain';
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
+import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
+import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
 
 export class MatchService{
 
@@ -60,11 +62,11 @@ export class MatchService{
         const db = await dbConnection
             
         const { rows: matchCreated } = await db.query(
-            `insert into info_matches (date, time, duration, description, location, latitude, longitude, min_players, max_players, price, id_organizer)
-            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            `insert into info_matches (date, time, duration, description, location, latitude, longitude, min_players, max_players, price, is_private, id_organizer)
+            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             returning id
             `,
-            [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.latitude, newMatch.longitude, newMatch.minPlayers, newMatch.maxPlayers, newMatch.price, newMatch.idOrganizer])
+            [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.latitude, newMatch.longitude, newMatch.minPlayers, newMatch.maxPlayers, newMatch.price, newMatch.isPrivate, newMatch.idOrganizer])
             
         if(!matchCreated) throw new Error('Error creating match')
 
@@ -78,27 +80,56 @@ export class MatchService{
             
         const db = await dbConnection
 
-        try{
-        console.log('updateMatchDto', updateMatchDto);
-        
         const { rows: matchUpdated } = await db.query(
         `update info_matches
                 set date = $1, time = $2, duration = $3, description = $4, 
                 location = $5, latitude = $6, longitude = $7, 
                 min_players = $8, max_players = $9, price = $10
-            where id = $11
+                is_private = $11
+            where id = $12
             returning id
             `,
-        [updateMatchDto.date, updateMatchDto.time, updateMatchDto.duration, updateMatchDto.description, updateMatchDto.location, updateMatchDto.latitude, updateMatchDto.longitude, updateMatchDto.minPlayers, updateMatchDto.maxPlayers, updateMatchDto.price, updateMatchDto.id])
+        [updateMatchDto.date, updateMatchDto.time, updateMatchDto.duration, updateMatchDto.description, updateMatchDto.location, updateMatchDto.latitude, updateMatchDto.longitude, updateMatchDto.minPlayers, updateMatchDto.maxPlayers, updateMatchDto.price, updateMatchDto.isPrivate, updateMatchDto.id])
                 
             if(!matchUpdated) throw new Error('Error updating match')
     
             return {
                 result: 'Match updated successfully'
             }
+    }
+
+    public async joinMatch( joinMatchDto: JoinMatchDto ){
+       
+        const db = await dbConnection;
+
+        const { rows: matchJoined } = await db.query(
+        `insert into rel_players_matches (position, id_match, id_user)
+        values ($1, $2)
+        returning id`,
+        [joinMatchDto.position, joinMatchDto.idMatch, joinMatchDto.idUser])
+
+        if(!matchJoined) throw new Error('Error joining to match')
+
+        return {
+            result: 'User joined to match successfully'
         }
-        catch(error){
-            console.log(error)
+
+    }
+
+    public async cancelMatch( cancelMatchDto: CancelMatchDto ){
+        
+        const db = await dbConnection;
+
+        const { rowCount: matchCanceled } = await db.query(
+        `update info_matches
+        set is_canceled = true
+        where id = $1`,
+        [cancelMatchDto.idMatch])
+
+        if(!matchCanceled) throw new Error('Error canceling match')
+
+        return {
+            result: 'Match canceled successfully'
         }
     }
 

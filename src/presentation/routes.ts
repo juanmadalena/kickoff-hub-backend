@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserRoutes } from "./user/routes";
+import { AuthRoutes } from "./auth/routes";
 import { MatchRoutes } from "./matches/routes";
 
 
@@ -9,7 +9,7 @@ export class AppRoutes{
 
         const router = Router();
 
-        router.use('/auth', UserRoutes.routes)
+        router.use('/auth', AuthRoutes.routes)
 
         router.use('/matches', MatchRoutes.routes)
 

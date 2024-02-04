@@ -1,52 +1,20 @@
-import { Request, Response } from "express";
-import { RegisterUserDto, handleError } from "../../domain";
-import { UserService } from '../services/user.service';
-import { LoginUserDto } from "../../domain";
-import { UpdateUserDto } from "../../domain";
-
+import { Request, Response } from "express"
+import { UserService } from "../services/user.service"
+import { UpdateUserDto, handleError, RateUserDto } from "../../domain"
 
 export class UserController{
+    AuthService: any
 
     constructor(
-        public readonly AuthService: UserService
+        public readonly UserService: UserService
     ){}
-
-    registerUser = (req: Request, res: Response) =>{
     
-        const [error, registerUserDto] = RegisterUserDto.create(req.body);
-
-        if(error){
-            return res.status(400).json({message: error})
-        }
-
-        this.AuthService.registerUser(registerUserDto!)
-        .then( (data) => res.status(201).json({data}) )
-        .catch( (error) => handleError(error, res) )
-
-    }
-
-    loginUser = (req: Request, res: Response) =>{
-    
-        const [error, loginUserDto] = LoginUserDto.create(req.body);
-
-        if(error){
-            return res.status(400).json({message: error})
-        }
-
-        this.AuthService.loginUser(loginUserDto!)
-        .then( (data) => res.status(200).json(data) )
-        .catch( (error) => handleError(error, res) )
-
-    }
-
     updateUser = (req: Request, res: Response) =>{
         const [ error, updateUserDto ] = UpdateUserDto.create(req.body)
 
-        if(error){
-            return res.status(400).json({message: error})
-        }
+        if(error) return res.status(400).json({message: error})
 
-        this.AuthService.updateUser( updateUserDto! )
+        this.UserService.updateUser( updateUserDto! )
         .then( (data) => res.status(200).json(data))
         .catch( (error) => handleError(error, res) )
 
@@ -54,12 +22,24 @@ export class UserController{
 
     updateUserPassword = (req: Request, res: Response) =>{
         const { id, password } = req.body
-        res.json({id, password})
+        this.UserService.updatePasswordUser(id, password)
     }
 
     uploadPofilePhotoUser = (req: Request, res: Response) =>{
         const { id, photo } = req.body
-        this.AuthService.uploadProfilePhotoUser(id, photo)
+        this.UserService.uploadProfilePhotoUser(id, photo)
+    }
+
+    rateUser = (req: Request, res: Response) =>{
+        
+        const [error, rateUserDto] = RateUserDto.create(req.body)
+
+        if(error) return res.status(400).json({message: error})
+
+        this.UserService.rateUser(rateUserDto!)
+        .then( (data) => res.status(200).json(data))
+        .catch( (error) => handleError(error, res) )
+
     }
 
 }

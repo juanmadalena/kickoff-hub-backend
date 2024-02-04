@@ -11,12 +11,13 @@ export class CreateMatchDto{
         public readonly maxPlayers: number,
         public readonly price: number,
         public readonly idOrganizer: string,
+        public readonly isPrivate: boolean,
     ){}
 
     
     static create(props: {[key:string]:any}): [string?, CreateMatchDto?] {
         
-        const { date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, idOrganizer } = props
+        const { date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, idOrganizer, isPrivate = false } = props
         console.log('props', props)
         // Date
         if(!date) return ['Date is required']
@@ -51,6 +52,6 @@ export class CreateMatchDto{
         // Id Organizer
         if(!idOrganizer) return ['Id Organizer is required']
 
-        return [undefined, new CreateMatchDto(date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, idOrganizer)]
+        return [undefined, new CreateMatchDto(date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, idOrganizer, isPrivate)]
     }
 }

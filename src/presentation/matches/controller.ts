@@ -1,6 +1,6 @@
-import { CreateMatchDto, UpdateMatchDto, handleError } from "../../domain";
-import { MatchService } from "../services/match.service";
 import { Request, Response } from "express";
+import { MatchService } from "../services/match.service";
+import { CreateMatchDto, UpdateMatchDto, handleError, JoinMatchDto, CancelMatchDto } from "../../domain";
 
 export class MatchController {
     
@@ -48,6 +48,26 @@ export class MatchController {
         }
 
         this.MatchService.updateMatch(updateMatch!)
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+    }
+
+    joinMatch = (req: Request, res: Response) => {
+        const [error, joinMatchDto] = JoinMatchDto.create(req.body)
+
+        if(error) return res.status(400).json({message: error})
+
+        this.MatchService.joinMatch(joinMatchDto!)
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+    }
+
+    cancelMatch = (req: Request, res: Response) => {
+        const [ error, cancelMatchDto ] = CancelMatchDto.create(req.body)
+
+        if(error) return res.status(400).json({message: error})
+
+        this.MatchService.cancelMatch(cancelMatchDto!)
             .then((data) => res.status(200).json(data))
             .catch((error) => handleError(error, res))
     }

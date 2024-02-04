@@ -13,9 +13,13 @@ export class MatchRoutes{
 
         router.get('/', controller.getMatches)
         router.post('/', controller.createMatch)
-        router.put('/', controller.updateMatch)
-
+        
         router.get('/:id', controller.getPlayersByMatch)
+        router.put('/:id', controller.updateMatch)
+        router.delete('/:id', controller.cancelMatch)
+
+        //join match
+        router.post('/:id/join', controller.joinMatch)
 
         return router
     }
