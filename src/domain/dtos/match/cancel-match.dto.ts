@@ -1,7 +1,8 @@
 export class CancelMatchDto {
     private constructor(
         public readonly idMatch: string,
-    ) { }
+        public readonly idUser: string,
+    ) {}
 
     static create(props: { [key: string]: any }): [string?, CancelMatchDto?] {
         const { idMatch, idUser } = props
@@ -9,6 +10,9 @@ export class CancelMatchDto {
         // Id Match
         if (!idMatch) return ['Id Match is required']
 
-        return [undefined, new CancelMatchDto(idMatch)]
+        // Id User
+        if (!idUser) return ['Id User is required']
+
+        return [undefined, new CancelMatchDto(idMatch, idUser)]
     }
 }

@@ -123,8 +123,8 @@ export class MatchService{
         const { rowCount: matchCanceled } = await db.query(
         `update info_matches
         set is_canceled = true
-        where id = $1`,
-        [cancelMatchDto.idMatch])
+        where id = $1 and id_organizer = $2`,
+        [cancelMatchDto.idMatch, cancelMatchDto.idUser])
 
         if(!matchCanceled) throw new Error('Error canceling match')
 
