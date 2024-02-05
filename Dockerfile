@@ -1,26 +1,26 @@
-# Usa una imagen base de Node.js
+# Use last node version
 FROM node:latest
 
-# Establece el directorio de trabajo en /usr/src/app
+# workdir
 WORKDIR /usr
 
-# Copia los archivos de configuración y dependencias
+# Copy dependency files and configuration file
 COPY package*.json ./
 COPY tsconfig.json ./
 
-COPY .env .env
+# COPY .env .env
 
-# Instala las dependencias
+# Install dependencies
 RUN npm install
 
-# Copia el código fuente de la aplicación
+# Copy all the files
 COPY . .
 
-# Compila TypeScript a JavaScript
+# Compile typescript files to javascript
 RUN npm run tsc
 
-# Expone el puerto en el que la aplicación se ejecutará
+# Expose the port where the application runs
 EXPOSE 8020
 
-# Comando para ejecutar la aplicación cuando el contenedor se inicia
+# Run the application
 CMD ["npm", "start"]
