@@ -20,12 +20,12 @@ export class UserController{
 
     }
 
-    updateUserPassword = (req: Request, res: Response) =>{
+    updateUserPassword = (req: Request, _res: Response) =>{
         const { id, password } = req.body
         this.UserService.updatePasswordUser(id, password)
     }
 
-    uploadPofilePhotoUser = (req: Request, res: Response) =>{
+    uploadPofilePhotoUser = (req: Request, _res: Response) =>{
         const { id, photo } = req.body
         this.UserService.uploadProfilePhotoUser(id, photo)
     }

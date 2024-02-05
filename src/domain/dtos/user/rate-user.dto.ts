@@ -1,5 +1,3 @@
-import { Position, regularExps } from "../../../config";
-
 export class RateUserDto {
 
     private constructor(

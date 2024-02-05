@@ -28,18 +28,18 @@ export class UserService{
         }
     }
 
-    public async updatePasswordUser( userId: string, password: string ){
+    public async updatePasswordUser( _userId: string, _password: string ){
         throw new Error('Method not implemented')
     }
 
-    public async uploadProfilePhotoUser( userId: string, photo: string ){
+    public async uploadProfilePhotoUser( _userId: string, _photo: string ){
         throw new Error('Method not implemented')
     }
 
     public async rateUser( rateUserDto: RateUserDto ){
         const db = await dbConnection
 
-        const { rows: [userRated], rowCount: existUser } = await db.query(
+        const { rowCount: existUser } = await db.query(
         `insert into info_ratings ( rating, id_match, id_user_rated, id_user_rated_by ))
         values ($1, $2, $3, $4)
         returning id`,
