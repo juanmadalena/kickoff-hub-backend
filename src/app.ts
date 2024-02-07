@@ -12,7 +12,8 @@ import { envs } from "./config";
 )()
 
 async function main() {
-
+    // Start the API server
     const server = new Server({ port: envs.PORT, routes: AppRoutes.routes })
     server.start()
+
 }

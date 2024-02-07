@@ -66,4 +66,11 @@ export class AuthService{
             token
         }
     }
+
+    validateToken = async (userId: string) => {
+        
+        const token = await JwtAdapter.generateToken({id: userId})
+
+        return { token }
+    }
 }

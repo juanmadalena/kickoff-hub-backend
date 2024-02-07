@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { get } from 'env-var';
 
-
 export const envs = {
 
   PORT: get('PORT').required().asPortNumber(),
@@ -23,5 +22,13 @@ export const envs = {
   DB_CONNECTION_TIMEOUT: get('DB_CONNECTION_TIMEOUT').required().asIntPositive(),
 
   JWT_SECRET: get('JWT_SECRET').required().asString(),
+
+  JWT_EXPIRATION_TIME: get('JWT_EXPIRATION_TIME').required().asString(),
+
+  CLOUDINARY_CLOUD_NAME: get('CLOUDINARY_CLOUD_NAME').required().asString(),
+  
+  CLOUDINARY_API_KEY: get('CLOUDINARY_API_KEY').required().asString(),
+
+  CLOUDINARY_API_SECRET: get('CLOUDINARY_API_SECRET').required().asString(),
 
 }
