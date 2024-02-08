@@ -23,6 +23,8 @@ export class Server{
     async start(){
 
         this.app.use(express.json())
+        //parse formdata
+        this.app.use(express.urlencoded({extended: true}))
         this.app.use(compression())
 
         this.app.use( this.routes )

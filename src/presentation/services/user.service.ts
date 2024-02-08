@@ -1,6 +1,7 @@
 import { dbConnection } from "../../data"
 import { CustomErrors, UpdateUserDto, UserEntity } from "../../domain"
 import { RateUserDto } from "../../domain/dtos/user/rate-user.dto"
+import { cloudinaryAdapter } from "../../config/"
 
 export class UserService{
 
@@ -32,8 +33,24 @@ export class UserService{
         throw new Error('Method not implemented')
     }
 
-    public async uploadProfilePhotoUser( _userId: string, _photo: string ){
-        throw new Error('Method not implemented')
+    public async uploadProfilePhotoUser( id: string, photo: Buffer ){
+        const secure_url = await cloudinaryAdapter.upload({ file: photo, name: id })
+        
+        if( !secure_url ) throw CustomErrors.badRequest('Error uploading profile picture')
+        
+        const db = await dbConnection
+
+        const { rowCount: existUser } = await db.query(
+            `update info_users
+            set photo = $1
+            where id = $2`
+            ,[secure_url, id])
+
+        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+
+        return {
+            data: "Profile picture uploaded successfully"
+        }
     }
 
     public async rateUser( rateUserDto: RateUserDto ){

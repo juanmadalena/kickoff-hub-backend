@@ -37,4 +37,12 @@ export class AuthController{
 
     }
 
+    validateToken = (req: Request, res: Response) =>{
+        const { id } = req.body
+
+        this.AuthService.validateToken(id)
+        .then( (data) => res.status(200).json(data) )
+        .catch( (error) => handleError(error, res) )
+    }
+
 }

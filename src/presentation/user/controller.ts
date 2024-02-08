@@ -25,9 +25,13 @@ export class UserController{
         this.UserService.updatePasswordUser(id, password)
     }
 
-    uploadPofilePhotoUser = (req: Request, _res: Response) =>{
-        const { id, photo } = req.body
-        this.UserService.uploadProfilePhotoUser(id, photo)
+    uploadPofilePhotoUser = (req: Request, res: Response) =>{
+        
+        const { id } = req.body
+        console.log('id', id)
+        this.UserService.uploadProfilePhotoUser(id, req.file?.buffer!)
+        .then( (data) => res.status(200).json(data))
+        .catch( (error) => handleError(error, res) )
     }
 
     rateUser = (req: Request, res: Response) =>{

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthRoutes } from "./auth/routes";
 import { MatchRoutes } from "./matches/routes";
 import { UserRoutes } from "./user/router";
+import { AuthMiddleware } from './middleware/auth.middleware';
 
 
 export class AppRoutes{
@@ -11,6 +12,8 @@ export class AppRoutes{
         const router = Router();
 
         router.use('/auth', AuthRoutes.routes)
+
+        router.use(AuthMiddleware.validateToken)
 
         router.use('/user', UserRoutes.routes)
 
