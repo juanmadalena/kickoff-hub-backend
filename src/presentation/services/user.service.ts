@@ -13,8 +13,8 @@ export class UserService{
         
         const { rows: [userFound], rowCount: existUser } = await db.query(`
         update info_users
-        set first_name = $1, last_name = $2, position = $4, secondary_positions = $5, email = $6
-        where id = $8
+        set first_name = $1, last_name = $2, position = $3, secondary_positions = $4, email = $5
+        where id = $6
         returning id, first_name, last_name, email, position, secondary_positions
         `, 
         [updateUserDto.firstName, updateUserDto.lastName, updateUserDto.position, updateUserDto.secondPosition, updateUserDto.email, updateUserDto.id]    
