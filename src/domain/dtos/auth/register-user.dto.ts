@@ -27,7 +27,7 @@ export class RegisterUserDto{
         // Email
         if(!email) return [{message:'Email is required', input:'email'}]
         if(!regularExps.email.test(email)) return [{message:'Invalid email', input:'email'}]
-
+        
         // Password
         if(!password) return [{message:'Password is required', input:'password'}]
         if(password.length < 8) return [{message:'Password must be at least 8 characters', input:'password'}]
