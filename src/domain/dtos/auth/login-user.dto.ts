@@ -1,22 +1,25 @@
+import { CustomError, regularExps } from "../../../config"
+
 export class LoginUserDto{
     private constructor(
-        public readonly username: string,
+        public readonly email: string,
         public readonly password: string,
     ){}
 
     
-    static create(props: {[key:string]:any}): [string?, LoginUserDto?] {
+    static create(props: {[key:string]:any}): [CustomError?, LoginUserDto?] {
         
-        const {username, password } = props
+        const {email, password } = props
         
-        // Username
-        if(!username) return ['Username or Email is required']
+        // Email
+        if(!email) return [{message:'Email is required'}]
+        if(regularExps.email.test(email)) return [{message:'Invalid email'}]
         
 
         // Password
-        if(!password) return ['Password is required']
-        if(password.length < 8) return ['Password must be at least 8 characters']
+        if(!password) return [{message:'Password is required'}]
+        if(password.length < 8) return [{message:'Password must be at least 8 characters'}]
 
-        return [undefined, new LoginUserDto(username, password)]
+        return [undefined, new LoginUserDto(email, password)]
     }
 }

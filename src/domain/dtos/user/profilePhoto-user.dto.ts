@@ -1,3 +1,4 @@
+import { CustomError } from "../../../config"
 
 export class ProfilePhotoUserDto{
     private constructor(
@@ -6,12 +7,11 @@ export class ProfilePhotoUserDto{
     ){}
 
     
-    static create(props: {[key:string]:any}): [string?, ProfilePhotoUserDto?] {
+    static create(props: {[key:string]:any}): [CustomError?, ProfilePhotoUserDto?] {
         
         const {id, photo = null } = props
         
-        // Username
-        if(!id) return ['Id is required']
+        if(!id) return [{message: 'Id is required'}]
         
         return [undefined, new ProfilePhotoUserDto(id, photo)]
     }

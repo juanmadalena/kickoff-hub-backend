@@ -13,14 +13,14 @@ export class MatchService{
         const db = await dbConnection
             
         const { rows: matches } = await db.query(
-        `select a.id, date, time, duration, description, location, latitude, longitude, num_players, min_players, max_players, price, id_organizer, first_name, last_name, username from 
+        `select a.id, date, time, duration, description, location, latitude, longitude, num_players, min_players, max_players, price, id_organizer, first_name, last_name from 
             (
                 select id, date, time, duration, description, location, latitude, longitude, num_players, min_players, max_players, price, id_organizer 
                 from info_matches where is_canceled = false and is_private = false and date = $1
             )a
             inner join
             (
-                select id, first_name, last_name, username, photo from info_users
+                select id, first_name, last_name, photo from info_users
             )b
         on a.id_organizer = b.id
         `,
@@ -38,9 +38,9 @@ export class MatchService{
         const db = await dbConnection
 
         const { rows: players } = await db.query(
-        `select id, first_name, last_name, username, position, secondary_positions, rating, photo from
+        `select id, first_name, last_name, position, secondary_positions, rating, photo from
             (
-                select id, first_name, last_name, username, position, secondary_positions, rating, photo  from info_users
+                select id, first_name, last_name, position, secondary_positions, rating, photo  from info_users
             )a
             inner join
             (

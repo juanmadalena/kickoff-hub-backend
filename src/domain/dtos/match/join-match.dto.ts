@@ -1,4 +1,4 @@
-import { Position } from '../../../config/interfaces/positions';
+import { Position } from '../../../config';
 export class JoinMatchDto {
     private constructor(
         public readonly idMatch: string,

@@ -13,11 +13,11 @@ export class UserService{
         
         const { rows: [userFound], rowCount: existUser } = await db.query(`
         update info_users
-        set first_name = $1, last_name = $2, username = $3, position = $4, secondary_positions = $5, email = $6
+        set first_name = $1, last_name = $2, position = $4, secondary_positions = $5, email = $6
         where id = $8
-        returning id, username, first_name, last_name, email, position, secondary_positions
+        returning id, first_name, last_name, email, position, secondary_positions
         `, 
-        [updateUserDto.firstName, updateUserDto.lastName, updateUserDto.username, updateUserDto.position, updateUserDto.secondPosition, updateUserDto.email, updateUserDto.id]    
+        [updateUserDto.firstName, updateUserDto.lastName, updateUserDto.position, updateUserDto.secondPosition, updateUserDto.email, updateUserDto.id]    
         )
         
         if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
