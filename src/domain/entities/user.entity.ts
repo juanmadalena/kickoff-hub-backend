@@ -7,7 +7,6 @@ export class UserEntity {
         public readonly id: string,
         public readonly first_name: string,
         public readonly last_name: string,
-        public readonly username: string,
         public readonly position?: Position,
         public readonly email?: string,
         public readonly photo?: string,
@@ -16,7 +15,7 @@ export class UserEntity {
     ) { }
 
     static getUserFromObject(object: { [key: string]: any }): UserEntity {
-        const { id, first_name, last_name, username, email, position, rating, secondary_positions, photo } = object
+        const { id, first_name, last_name, email, position, rating, secondary_positions, photo } = object
 
         if (!id) throw CustomErrors.badRequest('Invalid id')
         if (!first_name) throw CustomErrors.badRequest('Invalid name')
@@ -28,17 +27,16 @@ export class UserEntity {
             if (!secondary_positions.every((position: string) => Object.values(Position).includes(position.toLocaleUpperCase() as Position))) throw CustomErrors.badRequest('Invalid second position')
         }
 
-        return new UserEntity(id, first_name, last_name, username, position, email, photo, secondary_positions, rating)
+        return new UserEntity(id, first_name, last_name, position, email, photo, secondary_positions, rating)
     }
 
     static getOrganizerFromObject(object: { [key: string]: any }): UserEntity {
-        const { id, first_name, last_name, username, photo } = object
+        const { id, first_name, last_name, photo } = object
 
         if (!id) throw CustomErrors.badRequest('Invalid id')
         if (!first_name) throw CustomErrors.badRequest('Invalid name')
         if (!last_name) throw CustomErrors.badRequest('Invalid email')
-        if (!username) throw CustomErrors.badRequest('Invalid position')
 
-        return new UserEntity(id, first_name, last_name, username, undefined, undefined, photo)
+        return new UserEntity(id, first_name, last_name, undefined, undefined, photo)
     }
 }
