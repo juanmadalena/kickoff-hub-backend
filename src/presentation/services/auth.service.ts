@@ -20,7 +20,7 @@ export class AuthService{
             
             const { rows: [newUser] } = await db.query(`
                 insert into info_users (first_name, last_name, email, position, password) 
-                values ($1, $2, $3, $4, $5, $6) 
+                values ($1, $2, $3, $4, $5) 
                 returning id, first_name, last_name, email, position, password
                 `, 
             [registerUserDto.firstName, registerUserDto.lastName, registerUserDto.email, registerUserDto.position, hashedPassword])
