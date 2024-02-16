@@ -7,21 +7,25 @@ export class MatchEntity{
         public readonly organizer: UserEntity,
         public readonly date: Date,
         public readonly time: string,
-        public readonly description: string,
         public readonly location: string,
-        public readonly latitude: number,
-        public readonly longitude: number,
         public readonly price: number,
         public readonly num_players: number,
         public readonly min_players: number,
         public readonly max_players: number,
+        public readonly description?: string,
+        public readonly latitude?: number,
+        public readonly longitude?: number,
+        public readonly is_private?: boolean,
+        public readonly is_canceled?: boolean,
+        public readonly players?: UserEntity[],
     ){}
 
     public static getMatchesFromObject(object: {[key: string]: any}): MatchEntity{
-        const { id, date, time, description, location, latitude, longitude, num_players, min_players, max_players, price } = object
+        const { id, date, time, description, location, latitude, longitude, num_players, min_players, max_players, price, is_private, is_canceled, players } = object
 
         const organizerEntity = UserEntity.getOrganizerFromObject(object)
+        const playersEntityArray = players?.map(UserEntity.getUserFromObject)
 
-        return new MatchEntity(id, organizerEntity, date, time, description, location, latitude, longitude, price, num_players, min_players, max_players)
+        return new MatchEntity(id, organizerEntity, date, time, location, price, num_players, min_players, max_players, description, latitude, longitude, is_private, is_canceled, playersEntityArray)
     }
 }
