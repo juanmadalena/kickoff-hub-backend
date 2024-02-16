@@ -16,9 +16,9 @@ export class RegisterUserDto{
         const { firstName, lastName, email, position, password } = props
         
         // Name
-        if(!firstName) return [{message:'Name is required', input:'firstName'}]
+        if(!firstName) return [{message:'First name is required', input:'firstName'}]
 
-        if(!lastName) return [{message:'First name is required', input:'lastName'}]
+        if(!lastName) return [{message:'Last name is required', input:'lastName'}]
 
         // Position
         if(!position) return [{message:'Position is required', input:'position'}]
