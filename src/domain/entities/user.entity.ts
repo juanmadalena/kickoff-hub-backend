@@ -18,10 +18,10 @@ export class UserEntity {
         const { id, first_name, last_name, email, position, rating, secondary_positions, photo } = object
 
         if (!id) throw CustomErrors.badRequest('Invalid id')
-        if (!first_name) throw CustomErrors.badRequest('Invalid name')
-        if (!last_name) throw CustomErrors.badRequest('Invalid email')
+        if (!first_name) throw CustomErrors.badRequest('First name is required')
+        if (!last_name) throw CustomErrors.badRequest('Last name is required')
         if (!email && regularExps.email.test(email)) throw CustomErrors.badRequest('Invalid email')
-        if (!position) throw CustomErrors.badRequest('Invalid position')
+        if (!position) throw CustomErrors.badRequest('Position is required')
         if (secondary_positions) {
             if (secondary_positions.length > 2) throw CustomErrors.badRequest('Invalid second position')
             if (!secondary_positions.every((position: string) => Object.values(Position).includes(position.toLocaleUpperCase() as Position))) throw CustomErrors.badRequest('Invalid second position')
@@ -34,8 +34,8 @@ export class UserEntity {
         const { id, first_name, last_name, photo } = object
 
         if (!id) throw CustomErrors.badRequest('Invalid id')
-        if (!first_name) throw CustomErrors.badRequest('Invalid name')
-        if (!last_name) throw CustomErrors.badRequest('Invalid email')
+        if (!first_name) throw CustomErrors.badRequest('First name is required')
+        if (!last_name) throw CustomErrors.badRequest('Last name is required')
 
         return new UserEntity(id, first_name, last_name, undefined, undefined, photo)
     }
