@@ -17,9 +17,19 @@ export class MatchController {
 
     }
 
+    //Get match by id
+    getMatch = (req: Request, res: Response) => {
+        const id: string = req.params.id
+
+        this.MatchService.getMatchById( id )
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+
+    }
+
     //Get all players by match
     getPlayersByMatch = (req: Request, res: Response) => {
-
+        console.log('getPlayersByMatch')
         const id: string = req.params.id
 
         this.MatchService.getPlayersByMatch( id )

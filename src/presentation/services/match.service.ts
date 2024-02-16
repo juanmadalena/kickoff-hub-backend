@@ -13,9 +13,9 @@ export class MatchService{
         const db = await dbConnection
             
         const { rows: matches } = await db.query(
-        `select a.id, date, time, duration, description, location, latitude, longitude, num_players, min_players, max_players, price, id_organizer, first_name, last_name from 
+        `select a.id, date, time, duration, num_players, min_players, max_players, price, id_organizer, first_name, last_name from 
             (
-                select id, date, time, duration, description, location, latitude, longitude, num_players, min_players, max_players, price, id_organizer 
+                select id, date, time, duration, description, num_players, min_players, max_players, price, id_organizer 
                 from info_matches where is_canceled = false and is_private = false and date = $1
             )a
             inner join
@@ -32,6 +32,52 @@ export class MatchService{
             matches: matchesEntity
         }
 
+    }
+
+    public async getMatchById( id: string ){
+        
+        const db = await dbConnection;
+
+        // Get match
+        const { rows: [match] } = await db.query(
+            `select a.id, date, time, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name from 
+                (
+                    select id, date, time, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
+                    from info_matches where id = $1
+                )a
+                inner join
+                (
+                    select id, first_name, last_name, photo from info_users
+                )b
+            on a.id_organizer = b.id
+            `,
+        [id])
+
+        if(!match) throw new Error('Match not found')
+
+        const matchEntity = MatchEntity.getMatchesFromObject(match)
+
+        // Get players
+        const { rows: players } = await db.query(
+            `select id, first_name, last_name, position, secondary_positions, rating, photo from
+                (
+                    select id, first_name, last_name, position, secondary_positions, rating, photo  from info_users
+                )a
+                inner join
+                (
+                    select id_user from rel_players_matches where id_match = $1
+                )b
+            on a.id = b.id_user
+            `,
+        [id])
+            
+        const playersEntity = players?.map(UserEntity.getUserFromObject) || []
+
+
+        return {
+            match: {...matchEntity, players: playersEntity}
+        }
+    
     }
 
     public async getPlayersByMatch( idMatch: string ){

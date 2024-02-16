@@ -12,11 +12,12 @@ export class MatchRoutes{
         const controller = new MatchController(service)
 
         router.get('/', controller.getMatches)
+        router.get('/:id', controller.getMatch)
         router.post('/', controller.createMatch)
         router.put('/', controller.updateMatch)
         router.delete('/', controller.cancelMatch)
         
-        router.get('/:id', controller.getPlayersByMatch)
+        router.get('/players/:id', controller.getPlayersByMatch)
 
         router.post('/join', controller.joinMatch)
 
