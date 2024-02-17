@@ -40,9 +40,9 @@ export class MatchService{
 
         // Get match
         const { rows: [match] } = await db.query(
-            `select a.id, date, time, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name from 
+            `select a.id, date, time, location, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name from 
                 (
-                    select id, date, time, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
+                    select id, date, time, location, latitude, longitude, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
                     from info_matches where id = $1
                 )a
                 inner join
