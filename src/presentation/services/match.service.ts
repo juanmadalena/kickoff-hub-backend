@@ -150,7 +150,7 @@ export class MatchService{
 
         const { rows: matchJoined } = await db.query(
         `insert into rel_players_matches (position, id_match, id_user)
-        values ($1, $2)
+        values ($1, $2, $3)
         returning id`,
         [joinMatchDto.position, joinMatchDto.idMatch, joinMatchDto.idUser])
 
