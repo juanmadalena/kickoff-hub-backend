@@ -133,8 +133,7 @@ export class MatchService{
 
         const { rows: matchJoined } = await db.query(
         `insert into rel_players_matches (position, id_match, id_user)
-        values ($1, $2, $3)
-        returning id`,
+        values ($1, $2, $3) on conflict(id_user, id_match) do update set is_retired = false`,
         [joinMatchDto.position, joinMatchDto.idMatch, joinMatchDto.idUser])
 
         if(!matchJoined) throw new Error('Error joining to match')
