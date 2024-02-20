@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { MatchService } from "../services/match.service";
-import { CreateMatchDto, UpdateMatchDto, handleError, JoinMatchDto, CancelMatchDto } from "../../domain";
+import { CreateMatchDto, UpdateMatchDto, handleError, JoinMatchDto, CancelMatchDto, LeaveMatchDto } from "../../domain";
 
 export class MatchController {
     
@@ -38,6 +38,7 @@ export class MatchController {
 
     }
 
+    //Create a new match
     createMatch = (req: Request, res: Response) => {
         const [error, newMatch] = CreateMatchDto.create(req.body)
 
@@ -50,6 +51,7 @@ export class MatchController {
             .catch((error) => handleError(error, res))
     }
 
+    //Update a match
     updateMatch = (req: Request, res: Response) => {
         const [error, updateMatch] = UpdateMatchDto.create(req.body)
 
@@ -62,6 +64,7 @@ export class MatchController {
             .catch((error) => handleError(error, res))
     }
 
+    //Join a match
     joinMatch = (req: Request, res: Response) => {
         const [error, joinMatchDto] = JoinMatchDto.create(req.body)
 
@@ -72,6 +75,18 @@ export class MatchController {
             .catch((error) => handleError(error, res))
     }
 
+    //Leave a match
+    leaveMatch = (req: Request, res: Response) => {
+        const [error, leaveMatchDto] = LeaveMatchDto.create(req.body)
+
+        if(error) return res.status(400).json({message: error})
+
+        this.MatchService.leaveMatch(leaveMatchDto!)
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+    }
+
+    //Cancel a match
     cancelMatch = (req: Request, res: Response) => {
         const [ error, cancelMatchDto ] = CancelMatchDto.create(req.body)
 

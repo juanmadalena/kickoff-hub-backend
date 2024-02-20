@@ -17,4 +17,5 @@ export * from "./dtos/user/rate-user.dto";
 export * from "./dtos/match/create-match.dto";
 export * from "./dtos/match/update-match.dto";
 export * from "./dtos/match/join-match.dto";
+export * from "./dtos/match/leave-match.dto";
 export * from "./dtos/match/cancel-match.dto";
