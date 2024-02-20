@@ -13,12 +13,12 @@ export class UserRoutes{
         const controller = new UserController(service)
 
         //Update user info
-        router.put('/:id', controller.updateUser)
-        router.put('/:id/updatePassword', controller.updateUserPassword)
-        router.post('/:id/uploadProfilePhoto', [ MulterMiddleware.multer ] , controller.uploadPofilePhotoUser)
+        router.put('/', controller.updateUser)
+        router.put('/updatePassword', controller.updateUserPassword)
+        router.post('/uploadProfilePhoto', [ MulterMiddleware.multer ] , controller.uploadPofilePhotoUser)
 
         //Rate user
-        router.post('/:id/rate', controller.rateUser)
+        router.post('/rate', controller.rateUser)
 
         return router
     }

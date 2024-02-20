@@ -28,8 +28,7 @@ export class AuthMiddleware {
             const { rowCount: existUser } = await db.query("select id from info_users where id = $1", [payload.id])
             if( !existUser || existUser === 0 ) return res.status(401).json({message: 'Unauthorized'})
 
-            req.body.id = payload.id
-
+            req.body.idUser = payload.id
             next()
             
         } catch (error) {
