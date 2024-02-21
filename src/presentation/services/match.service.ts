@@ -22,7 +22,7 @@ export class MatchService{
             (
                 select id, first_name, last_name, photo from info_users
             )b
-        on a.id_organizer = b.id
+        on a.id_organizer = b.id order by time asc 
         `,
         [date])
         
