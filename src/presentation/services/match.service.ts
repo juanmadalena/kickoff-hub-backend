@@ -1,5 +1,5 @@
 import { dbConnection } from "../../data";
-import { MatchEntity, UserEntity, CreateMatchDto } from '../../domain';
+import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto } from '../../domain';
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
@@ -40,7 +40,7 @@ export class MatchService{
 
         // Get match
         const { rows: [match] } = await db.query(
-            `select a.id, date, time, location, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name from 
+            `select a.id, date, time,location, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name from 
                 (
                     select id, date, time, location, latitude, longitude, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
                     from info_matches where id = $1
@@ -57,25 +57,8 @@ export class MatchService{
 
         const matchEntity = MatchEntity.getMatchesFromObject(match)
 
-        // Get players
-        const { rows: players } = await db.query(
-            `select id, first_name, last_name, position, secondary_positions, rating, photo from
-                (
-                    select id, first_name, last_name, position, secondary_positions, rating, photo  from info_users
-                )a
-                inner join
-                (
-                    select id_user from rel_players_matches where id_match = $1
-                )b
-            on a.id = b.id_user
-            `,
-        [id])
-            
-        const playersEntity = players?.map(UserEntity.getUserFromObject) || []
-
-
         return {
-            match: {...matchEntity, players: playersEntity}
+            match: matchEntity
         }
     
     }
@@ -90,7 +73,7 @@ export class MatchService{
             )a
             inner join
             (
-                select id_user from rel_players_matches where id_match = $1
+                select id_user from rel_players_matches where id_match = $1 and is_retired = false
             )b
         on a.id = b.id_user
         `,
@@ -150,8 +133,7 @@ export class MatchService{
 
         const { rows: matchJoined } = await db.query(
         `insert into rel_players_matches (position, id_match, id_user)
-        values ($1, $2, $3)
-        returning id`,
+        values ($1, $2, $3) on conflict(id_user, id_match) do update set is_retired = false`,
         [joinMatchDto.position, joinMatchDto.idMatch, joinMatchDto.idUser])
 
         if(!matchJoined) throw new Error('Error joining to match')
@@ -160,6 +142,22 @@ export class MatchService{
             result: 'User joined to match successfully'
         }
 
+    }
+
+    public async leaveMatch( leaveMatchDto: LeaveMatchDto){
+        const db = await dbConnection;
+
+        const { rowCount: matchLeaved } = await db.query(
+            `UPDATE rel_players_matches 
+            SET is_retired = true, retired_at = now()
+            WHERE id_match = $1 and id_user = $2`,
+            [leaveMatchDto.idMatch, leaveMatchDto.idUser])
+
+        if(!matchLeaved) throw new Error('Error leaving match')
+
+        return {
+            result: 'Leaved match successfully'
+        }
     }
 
     public async cancelMatch( cancelMatchDto: CancelMatchDto ){

@@ -17,9 +17,9 @@ export class MatchRoutes{
         router.put('/', controller.updateMatch)
         router.delete('/', controller.cancelMatch)
         
-        router.get('/players/:id', controller.getPlayersByMatch)
-
-        router.post('/join', controller.joinMatch)
+        router.get('/:id/players', controller.getPlayersByMatch)
+        router.post('/:id/join', controller.joinMatch)
+        router.post('/:id/leave', controller.leaveMatch)
 
         return router
     }

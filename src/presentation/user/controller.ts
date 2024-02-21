@@ -10,7 +10,8 @@ export class UserController{
     ){}
     
     updateUser = (req: Request, res: Response) =>{
-        const [ error, updateUserDto ] = UpdateUserDto.create(req.body)
+        const { idUser, id, ...otherProps } = req.body
+        const [ error, updateUserDto ] = UpdateUserDto.create({ id:idUser, ...otherProps })
 
         if(error) return res.status(400).json({message: error})
 
@@ -21,15 +22,14 @@ export class UserController{
     }
 
     updateUserPassword = (req: Request, _res: Response) =>{
-        const { id, password } = req.body
-        this.UserService.updatePasswordUser(id, password)
+        const { idUser, password } = req.body
+        this.UserService.updatePasswordUser(idUser, password)
     }
 
     uploadPofilePhotoUser = (req: Request, res: Response) =>{
-        
-        const { id } = req.body
-        console.log('id', id)
-        this.UserService.uploadProfilePhotoUser(id, req.file?.buffer!)
+        const { idUser } = req.body
+
+        this.UserService.uploadProfilePhotoUser(idUser, req.file?.buffer!)
         .then( (data) => res.status(200).json(data))
         .catch( (error) => handleError(error, res) )
     }
