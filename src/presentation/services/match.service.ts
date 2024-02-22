@@ -4,28 +4,20 @@ import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
 
-export class MatchService{
+export class MatchService {
 
-    constructor(){}
+    constructor() { }
 
-    public async getMatchesByDate( date: Date ){
-    
+    public async getMatchesByDate(date: Date) {
+
         const db = await dbConnection
-            
+
         const { rows: matches } = await db.query(
-        `select a.id, date, time, duration, location, num_players, min_players, max_players, price, id_organizer, first_name, last_name, photo from 
-            (
-                select id, date, time, duration, location, num_players, min_players, max_players, price, id_organizer 
-                from info_matches where is_canceled = false and is_private = false and date = $1
-            )a
-            inner join
-            (
-                select id, first_name, last_name, photo from info_users
-            )b
-        on a.id_organizer = b.id order by time asc 
-        `,
-        [date])
-        
+            `select id, date, time, duration, location, num_players, min_players, max_players, price 
+            from info_matches 
+            where is_canceled = false and is_private = false and date = $1 order by time asc `,
+            [date])
+
         const matchesEntity = matches.map(MatchEntity.getMatchesFromObject)
 
         return {
@@ -34,13 +26,13 @@ export class MatchService{
 
     }
 
-    public async getMatchById( id: string ){
-        
+    public async getMatchById(id: string) {
+
         const db = await dbConnection;
 
         // Get match
         const { rows: [match] } = await db.query(
-            `select a.id, date, time,location, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name from 
+            `select a.id, date, time,location, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name, photo from 
                 (
                     select id, date, time, location, latitude, longitude, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
                     from info_matches where id = $1
@@ -51,23 +43,23 @@ export class MatchService{
                 )b
             on a.id_organizer = b.id
             `,
-        [id])
+            [id])
 
-        if(!match) throw new Error('Match not found')
+        if (!match) throw new Error('Match not found')
 
         const matchEntity = MatchEntity.getMatchesFromObject(match)
 
         return {
             match: matchEntity
         }
-    
+
     }
 
-    public async getPlayersByMatch( idMatch: string ){
+    public async getPlayersByMatch(idMatch: string) {
         const db = await dbConnection
 
         const { rows: players } = await db.query(
-        `select id, first_name, last_name, position, secondary_positions, rating, photo from
+            `select id, first_name, last_name, position, secondary_positions, rating, photo from
             (
                 select id, first_name, last_name, position, secondary_positions, rating, photo  from info_users
             )a
@@ -77,8 +69,8 @@ export class MatchService{
             )b
         on a.id = b.id_user
         `,
-        [idMatch])
-        
+            [idMatch])
+
         const playersEntity = players.map(UserEntity.getUserFromObject)
 
         return {
@@ -86,31 +78,74 @@ export class MatchService{
         }
     }
 
-    public async createMatch( newMatch: CreateMatchDto ){
-        
+    public async getMatchesPlayedByUser(idUser: string) {
+
         const db = await dbConnection
-            
+
+        const { rows: matches } = await db.query(`
+            select id, date, time, duration, location, num_players, min_players, max_players, price from
+                (
+                    select id, date, time, duration, location, num_players, min_players, max_players, price from info_matches im 
+                )a
+                inner join
+                (
+                    select id_match from rel_players_matches where id_user = $1 and is_retired = false
+                )b
+            on a.id = b.id_match order by date, time asc`
+            , [idUser])
+
+        if (!matches) throw new Error('Matches not found')
+
+        const matchesEntity = matches.map(MatchEntity.getMatchesFromObject)
+
+        return {
+            matches: matchesEntity
+        }
+
+    }
+
+    public async getMatchesOrganizedByUser(idUser: string) {
+        const db = await dbConnection
+
+        const { rows: matches } = await db.query(`
+        select id, date, time, duration, location, num_players, min_players, max_players, price from info_matches 
+        where id_organizer = $1 order by date, time asc
+        `, [idUser])
+
+        if (!matches) throw new Error('Matches not found')
+
+        const matchesEntity = matches.map(MatchEntity.getMatchesFromObject)
+
+        return {
+            matches: matchesEntity
+        }
+    }
+
+    public async createMatch(newMatch: CreateMatchDto) {
+
+        const db = await dbConnection
+
         const { rows: matchCreated } = await db.query(
             `insert into info_matches (date, time, duration, description, location, latitude, longitude, min_players, max_players, price, is_private, id_organizer)
             values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             returning id
             `,
             [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.latitude, newMatch.longitude, newMatch.minPlayers, newMatch.maxPlayers, newMatch.price, newMatch.isPrivate, newMatch.idOrganizer])
-            
-        if(!matchCreated) throw new Error('Error creating match')
+
+        if (!matchCreated) throw new Error('Error creating match')
 
         return {
             result: 'Match created successfully'
         }
-    
+
     }
 
-    public async updateMatch( updateMatchDto: UpdateMatchDto ){
-            
+    public async updateMatch(updateMatchDto: UpdateMatchDto) {
+
         const db = await dbConnection
 
         const { rows: matchUpdated } = await db.query(
-        `update info_matches
+            `update info_matches
                 set date = $1, time = $2, duration = $3, description = $4, 
                 location = $5, latitude = $6, longitude = $7, 
                 min_players = $8, max_players = $9, price = $10
@@ -118,25 +153,25 @@ export class MatchService{
             where id = $12
             returning id
             `,
-        [updateMatchDto.date, updateMatchDto.time, updateMatchDto.duration, updateMatchDto.description, updateMatchDto.location, updateMatchDto.latitude, updateMatchDto.longitude, updateMatchDto.minPlayers, updateMatchDto.maxPlayers, updateMatchDto.price, updateMatchDto.isPrivate, updateMatchDto.id])
-                
-            if(!matchUpdated) throw new Error('Error updating match')
-    
-            return {
-                result: 'Match updated successfully'
-            }
+            [updateMatchDto.date, updateMatchDto.time, updateMatchDto.duration, updateMatchDto.description, updateMatchDto.location, updateMatchDto.latitude, updateMatchDto.longitude, updateMatchDto.minPlayers, updateMatchDto.maxPlayers, updateMatchDto.price, updateMatchDto.isPrivate, updateMatchDto.id])
+
+        if (!matchUpdated) throw new Error('Error updating match')
+
+        return {
+            result: 'Match updated successfully'
+        }
     }
 
-    public async joinMatch( joinMatchDto: JoinMatchDto ){
-       
+    public async joinMatch(joinMatchDto: JoinMatchDto) {
+
         const db = await dbConnection;
 
         const { rows: matchJoined } = await db.query(
-        `insert into rel_players_matches (position, id_match, id_user)
+            `insert into rel_players_matches (position, id_match, id_user)
         values ($1, $2, $3) on conflict(id_user, id_match) do update set is_retired = false`,
-        [joinMatchDto.position, joinMatchDto.idMatch, joinMatchDto.idUser])
+            [joinMatchDto.position, joinMatchDto.idMatch, joinMatchDto.idUser])
 
-        if(!matchJoined) throw new Error('Error joining to match')
+        if (!matchJoined) throw new Error('Error joining to match')
 
         return {
             result: 'User joined to match successfully'
@@ -144,7 +179,7 @@ export class MatchService{
 
     }
 
-    public async leaveMatch( leaveMatchDto: LeaveMatchDto){
+    public async leaveMatch(leaveMatchDto: LeaveMatchDto) {
         const db = await dbConnection;
 
         const { rowCount: matchLeaved } = await db.query(
@@ -153,24 +188,24 @@ export class MatchService{
             WHERE id_match = $1 and id_user = $2`,
             [leaveMatchDto.idMatch, leaveMatchDto.idUser])
 
-        if(!matchLeaved) throw new Error('Error leaving match')
+        if (!matchLeaved) throw new Error('Error leaving match')
 
         return {
             result: 'Leaved match successfully'
         }
     }
 
-    public async cancelMatch( cancelMatchDto: CancelMatchDto ){
-        
+    public async cancelMatch(cancelMatchDto: CancelMatchDto) {
+
         const db = await dbConnection;
 
         const { rowCount: matchCanceled } = await db.query(
-        `update info_matches
+            `update info_matches
         set is_canceled = true
         where id = $1 and id_organizer = $2`,
-        [cancelMatchDto.idMatch, cancelMatchDto.idUser])
+            [cancelMatchDto.idMatch, cancelMatchDto.idUser])
 
-        if(!matchCanceled) throw new Error('Error canceling match')
+        if (!matchCanceled) throw new Error('Error canceling match')
 
         return {
             result: 'Match canceled successfully'

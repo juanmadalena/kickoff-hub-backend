@@ -39,6 +39,25 @@ export class MatchController {
 
     }
 
+    //Get all matches played by user
+    getMatchesPlayed = (req: Request, res: Response) => {
+
+        const { idUser } = req.body
+
+        this.MatchService.getMatchesPlayedByUser( idUser )
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+    }
+
+    //Get all matches organized by user
+    getMatchesOrganized = (req: Request, res: Response) => {
+        const { idUser } = req.body
+
+        this.MatchService.getMatchesOrganizedByUser( idUser )
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+    }
+
     //Create a new match
     createMatch = (req: Request, res: Response) => {
         const [error, newMatch] = CreateMatchDto.create(req.body)
