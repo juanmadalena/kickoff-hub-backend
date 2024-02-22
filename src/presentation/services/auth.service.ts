@@ -71,9 +71,6 @@ export class AuthService{
     validateToken = async (userId: string) => {
         
         const db = await dbConnection
-        
-        const token = await JwtAdapter.generateToken({id: userId})
-        if(!token) throw CustomErrors.internalServerError('Error generating token')
 
         const { rows: [user], rowCount: existUser } = await db.query(`
             select id, first_name, last_name, email, position from info_users 
@@ -81,6 +78,9 @@ export class AuthService{
             `, 
         [userId])
         if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+
+        const token = await JwtAdapter.generateToken({id: userId})
+        if(!token) throw CustomErrors.internalServerError('Error generating token')
 
         const userEntity = UserEntity.getUserFromObject(user)
 
