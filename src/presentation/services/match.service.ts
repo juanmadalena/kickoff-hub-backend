@@ -3,6 +3,7 @@ import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto } from '../../do
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
+import { groupMatchesByKey } from "../../utils/groupMatchesByKey";
 
 export class MatchService {
 
@@ -91,15 +92,17 @@ export class MatchService {
                 (
                     select id_match from rel_players_matches where id_user = $1 and is_retired = false
                 )b
-            on a.id = b.id_match order by date, time asc`
+            on a.id = b.id_match order by date, time desc`
             , [idUser])
 
         if (!matches) throw new Error('Matches not found')
 
         const matchesEntity = matches.map(MatchEntity.getMatchesFromObject)
 
+        const matchesGrouped = groupMatchesByKey('date', matchesEntity)
+
         return {
-            matches: matchesEntity
+            matches: matchesGrouped
         }
 
     }
