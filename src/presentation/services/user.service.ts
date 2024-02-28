@@ -1,11 +1,56 @@
 import { dbConnection } from "../../data"
-import { CustomErrors, UpdateUserDto, UserEntity } from "../../domain"
+import { CustomErrors, MatchEntity, UpdateUserDto, UserEntity } from "../../domain"
 import { RateUserDto } from "../../domain/dtos/user/rate-user.dto"
 import { cloudinaryAdapter } from "../../config/"
 
 export class UserService{
 
     constructor(){}
+
+    public async getUserDetailsById( id: string ){
+        const db = await dbConnection
+
+        const { rows: [userFound], rowCount: existUser } = await db.query(`
+            select id, first_name, last_name, position, photo, rating
+            from info_users
+            where id = $1
+        `, [id])
+
+        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+
+        const userEntity = UserEntity.getUserFromObject(userFound)
+
+        const { rows: [matchesPlayed, matchesOrganized] } = await db.query(`
+            select count(*) from rel_players_matches 
+            where id_user = $1 and is_retired = false
+            union
+            select count(*) from info_matches 
+            where id_organizer = $1 and is_canceled = false
+        `, [id])
+
+        const { rows: [lastMatchPlayed] } = await db.query(`
+            select a.* from 
+            (
+                select id, date, time, duration, location, num_players, min_players, max_players, price 
+                from info_matches where is_canceled = false and (date + time < current_timestamp ) and is_private = false order by date desc, time desc
+            )a
+            inner join
+            (
+                select id_match from rel_players_matches where id_user = $1 and is_retired = false
+            )b
+            on a.id = b.id_match limit 1
+        `, [id])
+
+
+        const lastMatchPlayedEntity = lastMatchPlayed ?? MatchEntity.getMatchesFromObject(lastMatchPlayed)
+
+        return {
+            user: userEntity,
+            matchesPlayed,
+            matchesOrganized,
+            lastMatchPlayed: lastMatchPlayedEntity
+        }
+    }
 
     public async updateUser( updateUserDto: UpdateUserDto ){
         

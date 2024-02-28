@@ -8,6 +8,14 @@ export class UserController{
     constructor(
         public readonly UserService: UserService
     ){}
+
+    getUserDetailsById = (req: Request, res: Response) =>{
+        const { id } = req.params
+        console.log(id)
+        this.UserService.getUserDetailsById(id)
+        .then( (data) => res.status(200).json(data))
+        .catch( (error) => handleError(error, res) )
+    }
     
     updateUser = (req: Request, res: Response) =>{
         const { idUser, id, ...otherProps } = req.body
