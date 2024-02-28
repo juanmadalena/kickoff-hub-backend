@@ -46,7 +46,7 @@ export class AuthService{
         const db = await dbConnection
 
         const { rows: [userFound], rowCount: existUser } = await db.query(`
-            select id, first_name, last_name, email, position, password from info_users 
+            select id, first_name, last_name, email, position, password, photo from info_users 
             where email = $1
             `, 
             [loginUserDto.email])
@@ -73,7 +73,7 @@ export class AuthService{
         const db = await dbConnection
 
         const { rows: [user], rowCount: existUser } = await db.query(`
-            select id, first_name, last_name, email, position from info_users 
+            select id, first_name, last_name, email, position, photo from info_users 
             where id = $1
             `, 
         [userId])
