@@ -23,7 +23,7 @@ export class UserService{
         const { rows: [matchesPlayed, matchesOrganized] } = await db.query(`
             select count(*) from rel_players_matches 
             where id_user = $1 and is_retired = false
-            union
+            union all
             select count(*) from info_matches 
             where id_organizer = $1 and is_canceled = false
         `, [id])
