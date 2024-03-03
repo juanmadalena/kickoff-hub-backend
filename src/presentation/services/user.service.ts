@@ -1,7 +1,8 @@
 import { dbConnection } from "../../data"
-import { CustomErrors, MatchEntity, UpdateUserDto, UserEntity } from "../../domain"
+import { CustomErrors, MatchEntity, UpdateUserDto, UpdateUserPasswordDto, UserEntity } from "../../domain"
 import { RateUserDto } from "../../domain/dtos/user/rate-user.dto"
-import { cloudinaryAdapter } from "../../config/"
+import { bcryptAdapter, cloudinaryAdapter } from "../../config/"
+import { UpdateUserEmailDto } from '../../domain/dtos/user/update-email.dto';
 
 export class UserService{
 
@@ -58,11 +59,11 @@ export class UserService{
         
         const { rows: [userFound], rowCount: existUser } = await db.query(`
         update info_users
-        set first_name = $1, last_name = $2, position = $3, secondary_positions = $4, email = $5
-        where id = $6
+        set first_name = $1, last_name = $2, position = $3
+        where id = $4
         returning id, first_name, last_name, email, position, secondary_positions
         `, 
-        [updateUserDto.firstName, updateUserDto.lastName, updateUserDto.position, updateUserDto.secondPosition, updateUserDto.email, updateUserDto.id]    
+        [updateUserDto.firstName, updateUserDto.lastName, updateUserDto.position, updateUserDto.id]    
         )
         
         if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
@@ -74,8 +75,50 @@ export class UserService{
         }
     }
 
-    public async updatePasswordUser( _userId: string, _password: string ){
-        throw new Error('Method not implemented')
+    public async updateEmailUser( updateUserEmailDto: UpdateUserEmailDto ){
+        const db = await dbConnection
+
+        const { rows: [userFound], rowCount: existUser } = await db.query(
+            `update info_users
+            set email = $1
+            where id = $2`,
+            [updateUserEmailDto.email, updateUserEmailDto.id]
+        )
+
+        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+
+        const userEntity = UserEntity.getUserFromObject(userFound)
+
+        return {
+            user: userEntity
+        }
+    }
+
+    public async updatePasswordUser( updateUserPasswordDto: UpdateUserPasswordDto ){
+
+        const db = await dbConnection
+
+        const { rows:[oldPassword]} = await db.query(`
+            select password from info_users where id = $1
+        `, [updateUserPasswordDto.id])
+
+        if( !bcryptAdapter.compare(updateUserPasswordDto.oldPassword, oldPassword.password) ) throw CustomErrors.badRequest('Invalid password')
+
+        const newPassword = bcryptAdapter.hash(updateUserPasswordDto.newPassword)
+
+        const { rowCount: existUser } = await db.query(
+            `update info_users
+            set password = $1
+            where id = $2`,
+            [newPassword, updateUserPasswordDto.id]
+        )
+
+        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+
+        return {
+            data: "Password updated successfully"
+        }
+        
     }
 
     public async uploadProfilePhotoUser( id: string, photo: Buffer ){

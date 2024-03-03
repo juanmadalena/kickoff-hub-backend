@@ -12,6 +12,8 @@ export * from "./errors/handle.errors";
 export * from "./dtos/auth/register-user.dto";
 export * from "./dtos/auth/login-user.dto";
 export * from "./dtos/user/update-user.dto";
+export * from "./dtos/user/update-email.dto";
+export * from "./dtos/user/update-password.dto";
 export * from "./dtos/user/rate-user.dto";
 
 export * from "./dtos/match/create-match.dto";
