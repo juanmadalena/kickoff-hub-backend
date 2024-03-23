@@ -1,3 +1,4 @@
+
 export class CreateMatchDto{
     private constructor(
         public readonly date: Date,
@@ -5,11 +6,10 @@ export class CreateMatchDto{
         public readonly duration: string,
         public readonly description: string,
         public readonly location: string,
-        public readonly latitude: number,
-        public readonly longitude: number,
+        public readonly idAddress: string,
         public readonly minPlayers: number,
         public readonly maxPlayers: number,
-        public readonly price: number,
+        // public readonly price: number,
         public readonly idOrganizer: string,
         public readonly isPrivate: boolean,
     ){}
@@ -17,8 +17,8 @@ export class CreateMatchDto{
     
     static create(props: {[key:string]:any}): [string?, CreateMatchDto?] {
         
-        const { date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, idOrganizer, isPrivate = false } = props
-        console.log('props', props)
+        const { date, time, duration, description, location, idAddress, minPlayers, maxPlayers, idOrganizer, isPrivate = false } = props
+
         // Date
         if(!date) return ['Date is required']
 
@@ -34,11 +34,8 @@ export class CreateMatchDto{
         // Location
         if(!location) return ['Location is required']
 
-        // Latitude
-        if(!latitude) return ['Latitude is required']
-
-        // Longitude
-        if(!longitude) return ['Longitude is required']
+        // Id Address
+        if(!idAddress) return ['Id Address is required']
 
         // Min Players
         if(!minPlayers) return ['Min Players is required']
@@ -47,11 +44,11 @@ export class CreateMatchDto{
         if(!maxPlayers) return ['Max Players is required']
 
         // Price
-        if(!price) return ['Price is required']
+        // if(!price) return ['Price is required']
 
         // Id Organizer
         if(!idOrganizer) return ['Id Organizer is required']
 
-        return [undefined, new CreateMatchDto(date, time, duration, description, location, latitude, longitude, minPlayers, maxPlayers, price, idOrganizer, isPrivate)]
+        return [undefined, new CreateMatchDto(date, time, duration, description, location, idAddress, minPlayers, maxPlayers, idOrganizer, isPrivate)]
     }
 }

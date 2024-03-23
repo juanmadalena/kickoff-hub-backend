@@ -4,6 +4,7 @@ import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
 import { groupMatchesByKey } from "../../utils/groupMatchesByKey";
+import { geocodeAdapter } from "../../config";
 
 export class MatchService {
 
@@ -128,12 +129,15 @@ export class MatchService {
 
         const db = await dbConnection
 
+        // Get coordinates by id place
+        const { lat, lng } = await geocodeAdapter.getCoordinatedByIdPlace(newMatch.idAddress)
+        if (!lat || !lng) throw new Error('Address not found')
+
         const { rows: matchCreated } = await db.query(
-            `insert into info_matches (date, time, duration, description, location, latitude, longitude, min_players, max_players, price, is_private, id_organizer)
-            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-            returning id
+            `insert into info_matches (date, time, duration, description, location, min_players, max_players, is_private, id_organizer, latitude, longitude)
+            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             `,
-            [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.latitude, newMatch.longitude, newMatch.minPlayers, newMatch.maxPlayers, newMatch.price, newMatch.isPrivate, newMatch.idOrganizer])
+            [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.minPlayers, newMatch.maxPlayers, newMatch.isPrivate, newMatch.idOrganizer, lat, lng])
 
         if (!matchCreated) throw new Error('Error creating match')
 
