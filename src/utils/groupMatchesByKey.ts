@@ -21,6 +21,6 @@ export const groupMatchesByKey = (key: string, matches: any[]) => {
         
         return groupedMatches;
     }catch(error){
-        throw console.log(error)
+        throw error;
     }
 };

@@ -11,14 +11,13 @@ export class UserController{
 
     getUserDetailsById = (req: Request, res: Response) =>{
         const { id } = req.params
-        console.log(id)
+
         this.UserService.getUserDetailsById(id)
         .then( (data) => res.status(200).json(data))
         .catch( (error) => handleError(error, res) )
     }
     
     updateUser = (req: Request, res: Response) =>{
-        console.log(req.body)
         const { idUser, id, ...otherProps } = req.body
         const [ error, updateUserDto ] = UpdateUserDto.create({ id:idUser, ...otherProps })
 
