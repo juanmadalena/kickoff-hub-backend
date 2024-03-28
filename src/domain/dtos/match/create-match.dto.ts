@@ -1,3 +1,4 @@
+import { checkDate } from "../../../utils/checkDate"
 
 export class CreateMatchDto{
     private constructor(
@@ -6,6 +7,7 @@ export class CreateMatchDto{
         public readonly duration: string,
         public readonly description: string,
         public readonly location: string,
+        public readonly address: string,
         public readonly idAddress: string,
         public readonly minPlayers: number,
         public readonly maxPlayers: number,
@@ -17,8 +19,8 @@ export class CreateMatchDto{
     
     static create(props: {[key:string]:any}): [string?, CreateMatchDto?] {
         
-        const { date, time, duration, description, location, idAddress, minPlayers, maxPlayers, idOrganizer, isPrivate = false } = props
-
+        const { date, time, duration, description, location, address, idAddress, minPlayers, maxPlayers, idOrganizer, isPrivate = false } = props
+        // console.log('props', props)
         // Date
         if(!date) return ['Date is required']
 
@@ -29,10 +31,13 @@ export class CreateMatchDto{
         if(!duration) return ['Duration is required']
 
         // Description
-        if(!description) return ['Description is required']
+        // if(!description) return ['Description is required']
 
         // Location
         if(!location) return ['Location is required']
+
+        //address
+        if(!address) return ['Address is required']
 
         // Id Address
         if(!idAddress) return ['Id Address is required']
@@ -49,6 +54,8 @@ export class CreateMatchDto{
         // Id Organizer
         if(!idOrganizer) return ['Id Organizer is required']
 
-        return [undefined, new CreateMatchDto(date, time, duration, description, location, idAddress, minPlayers, maxPlayers, idOrganizer, isPrivate)]
+        if(checkDate(date, time)) return ['Invalid date or time']
+
+        return [undefined, new CreateMatchDto(date, time, duration, description, location, address, idAddress, minPlayers, maxPlayers, idOrganizer, isPrivate)]
     }
 }

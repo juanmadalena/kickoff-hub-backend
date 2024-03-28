@@ -63,6 +63,7 @@ export class MatchController {
         const [error, newMatch] = CreateMatchDto.create(req.body)
 
         if(error){
+            console.log('error', error)
             return res.status(400).json({message: error})
         }
 

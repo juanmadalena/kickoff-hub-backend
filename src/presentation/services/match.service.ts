@@ -15,7 +15,7 @@ export class MatchService {
         const db = await dbConnection
 
         const { rows: matches } = await db.query(
-            `select id, date, time, duration, location, num_players, min_players, max_players, price 
+            `select id, date, time, duration, location, address, num_players, min_players, max_players, price 
             from info_matches 
             where is_canceled = false and is_private = false and date = $1 order by time asc `,
             [date])
@@ -34,9 +34,9 @@ export class MatchService {
 
         // Get match
         const { rows: [match] } = await db.query(
-            `select a.id, date, time,location, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name, photo from 
+            `select a.id, date, time, location, address, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name, photo from 
                 (
-                    select id, date, time, location, latitude, longitude, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
+                    select id, date, time, location, address, latitude, longitude, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
                     from info_matches where id = $1
                 )a
                 inner join
@@ -85,9 +85,9 @@ export class MatchService {
         const db = await dbConnection
 
         const { rows: matches } = await db.query(`
-            select id, date, time, duration, location, num_players, min_players, max_players, price from
+            select id, date, time, duration, location, address, num_players, min_players, max_players, price from
                 (
-                    select id, date, time, duration, location, num_players, min_players, max_players, price from info_matches im 
+                    select id, date, time, duration, location, address, num_players, min_players, max_players, price from info_matches im 
                 )a
                 inner join
                 (
@@ -112,7 +112,7 @@ export class MatchService {
         const db = await dbConnection
 
         const { rows: matches } = await db.query(`
-        select id, date, time, duration, location, num_players, min_players, max_players, price from info_matches 
+        select id, date, time, duration, location, address, num_players, min_players, max_players, price from info_matches 
         where id_organizer = $1 order by date, time asc
         `, [idUser])
 
@@ -127,19 +127,19 @@ export class MatchService {
 
     public async createMatch(newMatch: CreateMatchDto) {
 
-        const db = await dbConnection
+        // const db = await dbConnection
 
         // Get coordinates by id place
         const { lat, lng } = await geocodeAdapter.getCoordinatedByIdPlace(newMatch.idAddress)
         if (!lat || !lng) throw new Error('Address not found')
 
-        const { rows: matchCreated } = await db.query(
-            `insert into info_matches (date, time, duration, description, location, min_players, max_players, is_private, id_organizer, latitude, longitude)
-            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-            `,
-            [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.minPlayers, newMatch.maxPlayers, newMatch.isPrivate, newMatch.idOrganizer, lat, lng])
+        // const { rows: matchCreated } = await db.query(
+        //     `insert into info_matches (date, time, duration, description, location, min_players, max_players, is_private, id_organizer, latitude, longitude, address)
+        //     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        //     `,
+        //     [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.minPlayers, newMatch.maxPlayers, newMatch.isPrivate, newMatch.idOrganizer, lat, lng, newMatch.address])
 
-        if (!matchCreated) throw new Error('Error creating match')
+        // if (!matchCreated) throw new Error('Error creating match')
 
         return {
             result: 'Match created successfully'
