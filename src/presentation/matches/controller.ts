@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { MatchService } from "../services/match.service";
-import { CreateMatchDto, UpdateMatchDto, handleError, JoinMatchDto, CancelMatchDto, LeaveMatchDto } from "../../domain";
+import { CreateMatchDto, UpdateMatchDto, handleError, JoinMatchDto, CancelMatchDto, LeaveMatchDto, PlayersToRateDto } from "../../domain";
 
 export class MatchController {
     
@@ -123,6 +123,19 @@ export class MatchController {
         if(error) return res.status(400).json({message: error})
 
         this.MatchService.cancelMatch(cancelMatchDto!)
+            .then((data) => res.status(200).json(data))
+            .catch((error) => handleError(error, res))
+    }
+
+    //Players to rate
+    getPlayersToRate = (req: Request, res: Response) => {
+        const idMatch: string = req.params.id;
+        
+        const [error, playersToRateDto] = PlayersToRateDto.create({ idMatch, ...req.body})
+
+        if(error) return res.status(400).json({message: error})
+
+        this.MatchService.getPlayersToRate(playersToRateDto!)
             .then((data) => res.status(200).json(data))
             .catch((error) => handleError(error, res))
     }

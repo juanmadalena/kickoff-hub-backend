@@ -1,5 +1,5 @@
 import { dbConnection } from "../../data";
-import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto } from '../../domain';
+import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto, PlayersToRateDto } from '../../domain';
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
@@ -218,5 +218,43 @@ export class MatchService {
             result: 'Match canceled successfully'
         }
     }
+
+    public async getPlayersToRate(playersToRateDto: PlayersToRateDto) {
+            const db = await dbConnection
+
+            // Verify if user played the match
+            const { rowCount: playedMatch } = await db.query(
+                `select id from rel_players_matches where id_match = $1 and id_user = $2`,
+            [playersToRateDto.idMatch, playersToRateDto.idUser])
+
+            if (!playedMatch) throw new Error('User did not play the match')
+    
+            const { rows: players } = await db.query(
+                `select C.*, rating from
+                (
+                    select B.* from 
+                    (
+                        select id_user from rel_players_matches where id_match = $1
+                    )A
+                    inner join 
+                    (
+                        select id, first_name, last_name, position, photo from info_users 
+                    )B
+                    on A.id_user = B.id
+                )C
+                left join
+                (
+                    select id_user_rated ,rating from info_ratings where id_match = $1 and id_user_rated_by = $2
+                )D
+                on C.id = D.id_user_rated where id != $2 order by rating desc, C.first_name, C.last_name
+            `,
+            [playersToRateDto.idMatch, playersToRateDto.idUser])
+    
+            const playersEntity = players.map(UserEntity.getUserFromObject)
+    
+            return {
+                players: playersEntity
+            }
+        }
 
 }
