@@ -3,7 +3,6 @@ import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto, PlayersToRateDt
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
-// import { groupMatchesByKey } from "../../utils/groupMatchesByKey";
 import { geocodeAdapter } from "../../config";
 
 export class MatchService {
@@ -99,8 +98,6 @@ export class MatchService {
         if (!matches) throw new Error('Matches not found')
 
         const matchesEntity = matches.map(MatchEntity.getMatchesFromObject)
-
-        // const matchesGrouped = groupMatchesByKey(groupBy, matchesEntity)
 
         return {
             matches: matchesEntity
