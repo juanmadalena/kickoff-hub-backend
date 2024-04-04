@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { UserService } from "../services/user.service"
-import { UpdateUserDto, handleError, RateUserDto, UpdateUserEmailDto, UpdateUserPasswordDto } from "../../domain"
+import { UpdateUserDto, handleError, UpdateUserEmailDto, UpdateUserPasswordDto } from "../../domain"
 
 export class UserController{
     AuthService: any
@@ -59,18 +59,6 @@ export class UserController{
         this.UserService.uploadProfilePhotoUser(idUser, req.file?.buffer!)
         .then( (data) => res.status(200).json(data))
         .catch( (error) => handleError(error, res) )
-    }
-
-    rateUser = (req: Request, res: Response) =>{
-        
-        const [error, rateUserDto] = RateUserDto.create(req.body)
-
-        if(error) return res.status(400).json({message: error})
-
-        this.UserService.rateUser(rateUserDto!)
-        .then( (data) => res.status(200).json(data))
-        .catch( (error) => handleError(error, res) )
-
     }
 
 }

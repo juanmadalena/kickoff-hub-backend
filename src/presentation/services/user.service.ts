@@ -1,8 +1,7 @@
 import { dbConnection } from "../../data"
 import { CustomErrors, MatchEntity, UpdateUserDto, UpdateUserPasswordDto, UserEntity } from "../../domain"
-import { RateUserDto } from "../../domain/dtos/user/rate-user.dto"
 import { bcryptAdapter, cloudinaryAdapter } from "../../config/"
-import { UpdateUserEmailDto } from '../../domain/dtos/user/update-email.dto';
+import { UpdateUserEmailDto } from '../../domain';
 
 export class UserService{
 
@@ -32,7 +31,7 @@ export class UserService{
         const { rows: [lastMatchPlayed] } = await db.query(`
             select a.* from 
             (
-                select id, date, time, duration, location, num_players, min_players, max_players, price 
+                select id, date, time, duration, location, address, num_players, min_players, max_players, price 
                 from info_matches where is_canceled = false and (date + time < current_timestamp ) and is_private = false order by date desc, time desc
             )a
             inner join
@@ -42,8 +41,7 @@ export class UserService{
             on a.id = b.id_match limit 1
         `, [id])
 
-
-        const lastMatchPlayedEntity = lastMatchPlayed ?? MatchEntity.getMatchesFromObject(lastMatchPlayed)
+        const lastMatchPlayedEntity = lastMatchPlayed && MatchEntity.getMatchesFromObject(lastMatchPlayed)
 
         return {
             user: userEntity,
@@ -141,20 +139,4 @@ export class UserService{
         }
     }
 
-    public async rateUser( rateUserDto: RateUserDto ){
-        const db = await dbConnection
-
-        const { rowCount: existUser } = await db.query(
-        `insert into info_ratings ( rating, id_match, id_user_rated, id_user_rated_by ))
-        values ($1, $2, $3, $4)
-        returning id`,
-        [rateUserDto.rate, rateUserDto.idMatch, rateUserDto.idUserRated, rateUserDto.idUser]
-        )
-
-        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
-
-        return {
-            data: "User rated successfully"
-        }
-    }
 }

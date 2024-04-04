@@ -18,10 +18,7 @@ export class UserRoutes{
         router.put('/email', controller.updateUser)
         router.put('/updatePassword', controller.updateUserPassword)
         router.post('/uploadProfilePhoto', [ MulterMiddleware.multer ] , controller.uploadPofilePhotoUser)
-
-        //Rate user
-        router.post('/rate', controller.rateUser)
-
+        
         return router
     }
 

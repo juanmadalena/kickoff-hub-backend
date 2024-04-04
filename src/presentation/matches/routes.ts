@@ -21,8 +21,11 @@ export class MatchRoutes{
         router.get('/organized', controller.getMatchesOrganized)
         
         router.get('/:id', controller.getMatch)
+
         router.get('/:id/players', controller.getPlayersByMatch)
         router.get('/:id/playersToRate', controller.getPlayersToRate)
+        router.post('/:id/ratePlayer', controller.rateUser)
+
         router.post('/:id/join', controller.joinMatch)
         router.post('/:id/leave', controller.leaveMatch)
 

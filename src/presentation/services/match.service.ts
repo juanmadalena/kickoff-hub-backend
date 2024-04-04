@@ -1,9 +1,9 @@
 import { dbConnection } from "../../data";
-import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto, PlayersToRateDto } from '../../domain';
+import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto, PlayersToRateDto, RateUserDto, CustomErrors } from '../../domain';
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
-import { groupMatchesByKey } from "../../utils/groupMatchesByKey";
+// import { groupMatchesByKey } from "../../utils/groupMatchesByKey";
 import { geocodeAdapter } from "../../config";
 
 export class MatchService {
@@ -93,17 +93,17 @@ export class MatchService {
                 (
                     select id_match from rel_players_matches where id_user = $1 and is_retired = false
                 )b
-            on a.id = b.id_match order by date, time desc`
+            on a.id = b.id_match order by date desc, time desc`
             , [idUser])
 
         if (!matches) throw new Error('Matches not found')
 
         const matchesEntity = matches.map(MatchEntity.getMatchesFromObject)
 
-        const matchesGrouped = groupMatchesByKey('date', matchesEntity)
+        // const matchesGrouped = groupMatchesByKey(groupBy, matchesEntity)
 
         return {
-            matches: matchesGrouped
+            matches: matchesEntity
         }
 
     }
@@ -220,41 +220,60 @@ export class MatchService {
     }
 
     public async getPlayersToRate(playersToRateDto: PlayersToRateDto) {
-            const db = await dbConnection
+        const db = await dbConnection
 
-            // Verify if user played the match
-            const { rowCount: playedMatch } = await db.query(
-                `select id from rel_players_matches where id_match = $1 and id_user = $2`,
-            [playersToRateDto.idMatch, playersToRateDto.idUser])
+        // Verify if user played the match
+        const { rowCount: playedMatch } = await db.query(
+            `select id from rel_players_matches where id_match = $1 and id_user = $2`,
+        [playersToRateDto.idMatch, playersToRateDto.idUser])
 
-            if (!playedMatch) throw new Error('User did not play the match')
-    
-            const { rows: players } = await db.query(
-                `select C.*, rating from
+        if (!playedMatch) throw CustomErrors.badRequest('User did not play the match')
+
+        const { rows: players } = await db.query(
+            `select C.*, rating from
+            (
+                select B.* from 
                 (
-                    select B.* from 
-                    (
-                        select id_user from rel_players_matches where id_match = $1
-                    )A
-                    inner join 
-                    (
-                        select id, first_name, last_name, position, photo from info_users 
-                    )B
-                    on A.id_user = B.id
-                )C
-                left join
+                    select id_user from rel_players_matches where id_match = $1
+                )A
+                inner join 
                 (
-                    select id_user_rated ,rating from info_ratings where id_match = $1 and id_user_rated_by = $2
-                )D
-                on C.id = D.id_user_rated where id != $2 order by rating desc, C.first_name, C.last_name
-            `,
-            [playersToRateDto.idMatch, playersToRateDto.idUser])
-    
-            const playersEntity = players.map(UserEntity.getUserFromObject)
-    
-            return {
-                players: playersEntity
-            }
+                    select id, first_name, last_name, position, photo from info_users 
+                )B
+                on A.id_user = B.id
+            )C
+            left join
+            (
+                select id_user_rated ,rating from info_ratings where id_match = $1 and id_user_rated_by = $2
+            )D
+            on C.id = D.id_user_rated where id != $2 order by rating desc, C.first_name, C.last_name
+        `,
+        [playersToRateDto.idMatch, playersToRateDto.idUser])
+
+        const playersEntity = players.map(UserEntity.getUserFromObject)
+
+        return {
+            players: playersEntity
         }
+    }
+    
+    public async rateUser( rateUserDto: RateUserDto ){
+        const db = await dbConnection
+
+        const { rowCount: existUser } = await db.query(
+            `insert into info_ratings ( rating, id_match, id_user_rated, id_user_rated_by )
+            values ($1, $2, $3, $4) 
+            on conflict(id_match, id_user_rated, id_user_rated_by) do update set rating = $1
+            returning id`,
+            [rateUserDto.rate, rateUserDto.idMatch, rateUserDto.idUserRated, rateUserDto.idUser]
+        )
+        console.log('rateUserDto', existUser)
+
+        if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
+
+        return {
+            data: "User rated successfully"
+        }
+    }
 
 }
