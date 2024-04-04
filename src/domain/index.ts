@@ -22,3 +22,4 @@ export * from "./dtos/match/join-match.dto";
 export * from "./dtos/match/leave-match.dto";
 export * from "./dtos/match/cancel-match.dto";
 export * from "./dtos/match/players-to-rate.dto";
+export * from "./dtos/match/remove-match.dto";

@@ -15,7 +15,7 @@ export class UserRoutes{
         //Update user info
         router.get('/:id', controller.getUserDetailsById)
         router.put('/', controller.updateUser)
-        router.put('/email', controller.updateUser)
+        router.put('/updateEmail', controller.updateUserEmail)
         router.put('/updatePassword', controller.updateUserPassword)
         router.post('/uploadProfilePhoto', [ MulterMiddleware.multer ] , controller.uploadPofilePhotoUser)
         

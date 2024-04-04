@@ -30,9 +30,8 @@ export class UserController{
     }
 
     updateUserEmail = (req: Request, res: Response) =>{
-        const { idUser, email } = req.body
 
-        const [ error, updateUserEmailDto ] = UpdateUserEmailDto.create({ id:idUser, email })
+        const [ error, updateUserEmailDto ] = UpdateUserEmailDto.create(req.body)
 
         if(error) return res.status(400).json({message: error})
 

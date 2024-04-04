@@ -28,6 +28,7 @@ export class MatchRoutes{
 
         router.post('/:id/join', controller.joinMatch)
         router.post('/:id/leave', controller.leaveMatch)
+        router.post('/:id/remove', controller.removePlayer)
 
 
         return router

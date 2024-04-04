@@ -1,5 +1,5 @@
 import { dbConnection } from "../../data";
-import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto, PlayersToRateDto, RateUserDto, CustomErrors } from '../../domain';
+import { MatchEntity, UserEntity, CreateMatchDto, LeaveMatchDto, PlayersToRateDto, RateUserDto, CustomErrors, RemoveMatchDto } from '../../domain';
 import { UpdateMatchDto } from '../../domain/dtos/match/update-match.dto';
 import { JoinMatchDto } from '../../domain/dtos/match/join-match.dto';
 import { CancelMatchDto } from '../../domain/dtos/match/cancel-match.dto';
@@ -124,22 +124,22 @@ export class MatchService {
 
     public async createMatch(newMatch: CreateMatchDto) {
 
-        // const db = await dbConnection
+        const db = await dbConnection
 
         // Get coordinates by id place
         const { lat, lng } = await geocodeAdapter.getCoordinatedByIdPlace(newMatch.idAddress)
         if (!lat || !lng) throw new Error('Address not found')
 
-        // const { rows: matchCreated } = await db.query(
-        //     `insert into info_matches (date, time, duration, description, location, min_players, max_players, is_private, id_organizer, latitude, longitude, address)
-        //     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-        //     `,
-        //     [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.minPlayers, newMatch.maxPlayers, newMatch.isPrivate, newMatch.idOrganizer, lat, lng, newMatch.address])
+        const { rows: matchCreated } = await db.query(
+            `insert into info_matches (date, time, duration, description, location, min_players, max_players, is_private, id_organizer, latitude, longitude, address)
+            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            `,
+            [newMatch.date, newMatch.time, newMatch.duration, newMatch.description, newMatch.location, newMatch.minPlayers, newMatch.maxPlayers, newMatch.isPrivate, newMatch.idOrganizer, lat, lng, newMatch.address])
 
-        // if (!matchCreated) throw new Error('Error creating match')
+        if (!matchCreated) throw new Error('Error creating match')
 
         return {
-            result: 'Match created successfully'
+            data: 'Match created successfully'
         }
 
     }
@@ -162,7 +162,7 @@ export class MatchService {
         if (!matchUpdated) throw new Error('Error updating match')
 
         return {
-            result: 'Match updated successfully'
+            data: 'Match updated successfully'
         }
     }
 
@@ -178,7 +178,7 @@ export class MatchService {
         if (!matchJoined) throw new Error('Error joining to match')
 
         return {
-            result: 'User joined to match successfully'
+            data: 'User joined to match successfully'
         }
 
     }
@@ -195,7 +195,30 @@ export class MatchService {
         if (!matchLeaved) throw new Error('Error leaving match')
 
         return {
-            result: 'Leaved match successfully'
+            data: 'Leaved match successfully'
+        }
+    }
+
+    public async removePlayer( removeMatchDto: RemoveMatchDto) {
+        const db = await dbConnection
+
+        const { rowCount: isOrganizer } = await db.query(
+            `select id from info_matches where id = $1 and id_organizer = $2`
+            ,[removeMatchDto.idMatch, removeMatchDto.idUser]
+        )
+
+        if (!isOrganizer) throw new Error('User is not the organizer')
+
+        const { rowCount: playerRemoved } = await db.query(
+            `update rel_players_matches
+            set is_retired = true, retired_at = now()
+            where id_match = $1 and id_user = $2 `,
+            [removeMatchDto.idMatch, removeMatchDto.idUserToRemove])
+
+        if (!playerRemoved) throw new Error('Error removing player')
+
+        return {
+            data: 'Player removed successfully'
         }
     }
 
@@ -212,7 +235,7 @@ export class MatchService {
         if (!matchCanceled) throw new Error('Error canceling match')
 
         return {
-            result: 'Match canceled successfully'
+            data: 'Match canceled successfully'
         }
     }
 

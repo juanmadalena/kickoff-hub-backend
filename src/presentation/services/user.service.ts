@@ -76,19 +76,17 @@ export class UserService{
     public async updateEmailUser( updateUserEmailDto: UpdateUserEmailDto ){
         const db = await dbConnection
 
-        const { rows: [userFound], rowCount: existUser } = await db.query(
+        const { rowCount: existUser } = await db.query(
             `update info_users
             set email = $1
             where id = $2`,
-            [updateUserEmailDto.email, updateUserEmailDto.id]
+            [updateUserEmailDto.email, updateUserEmailDto.idUser]
         )
 
         if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
 
-        const userEntity = UserEntity.getUserFromObject(userFound)
-
         return {
-            user: userEntity
+            data: "Email updated successfully"
         }
     }
 
@@ -98,7 +96,7 @@ export class UserService{
 
         const { rows:[oldPassword]} = await db.query(`
             select password from info_users where id = $1
-        `, [updateUserPasswordDto.id])
+        `, [updateUserPasswordDto.idUser])
 
         if( !bcryptAdapter.compare(updateUserPasswordDto.oldPassword, oldPassword.password) ) throw CustomErrors.badRequest('Invalid password')
 
@@ -108,9 +106,9 @@ export class UserService{
             `update info_users
             set password = $1
             where id = $2`,
-            [newPassword, updateUserPasswordDto.id]
+            [newPassword, updateUserPasswordDto.idUser]
         )
-
+        
         if( !existUser || existUser === 0 ) throw CustomErrors.badRequest('Invalid user')
 
         return {
