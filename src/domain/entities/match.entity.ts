@@ -25,6 +25,9 @@ export class MatchEntity{
     public static getMatchesFromObject(object: {[key: string]: any}): MatchEntity{
         const { id, date, duration, time, description, location, address, latitude, longitude, num_players, min_players, max_players, price, is_private, is_canceled, players, id_organizer } = object
         
+        const offset = new Date().getTimezoneOffset()
+        date.setMinutes(date.getMinutes() - offset)
+        
         // If organizer is provided, create a new UserEntity
         const organizerEntity = id_organizer && UserEntity.getOrganizerFromObject(object)
 
