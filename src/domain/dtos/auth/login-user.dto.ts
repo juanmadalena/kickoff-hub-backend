@@ -8,10 +8,13 @@ export class LoginUserDto{
 
     
     static create(props: {[key:string]:any}): [CustomError?, LoginUserDto?] {
-        
-        const {email, password } = props
+        let { email } = props
+        const { password } = props
         // Email
         if(!email) return [{message:'Email is required'}]
+        if(typeof email !== 'string') return [{message:'Invalid email'}]
+        if(email.trim().length === 0) return [{message:'Email is required'}]
+        email = email.toLowerCase()
         
         // Password
         if(!password) return [{message:'Password is required'}]
