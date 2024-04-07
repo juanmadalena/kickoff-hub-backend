@@ -150,14 +150,12 @@ export class MatchService {
 
         const { rows: matchUpdated } = await db.query(
             `update info_matches
-                set date = $1, time = $2, duration = $3, description = $4, 
-                location = $5, latitude = $6, longitude = $7, 
-                min_players = $8, max_players = $9, price = $10
-                is_private = $11
-            where id = $12
+                set duration = $1, description = $2, 
+                min_players = $3, max_players = $4
+            where id = $5
             returning id
             `,
-            [updateMatchDto.date, updateMatchDto.time, updateMatchDto.duration, updateMatchDto.description, updateMatchDto.location, updateMatchDto.latitude, updateMatchDto.longitude, updateMatchDto.minPlayers, updateMatchDto.maxPlayers, updateMatchDto.price, updateMatchDto.isPrivate, updateMatchDto.id])
+            [updateMatchDto.duration, updateMatchDto.description, updateMatchDto.minPlayers, updateMatchDto.maxPlayers, updateMatchDto.id])
 
         if (!matchUpdated) throw new Error('Error updating match')
 
@@ -227,7 +225,7 @@ export class MatchService {
         const db = await dbConnection;
 
         const { rowCount: matchCanceled } = await db.query(
-            `update info_matches
+        `update info_matches
         set is_canceled = true
         where id = $1 and id_organizer = $2`,
             [cancelMatchDto.idMatch, cancelMatchDto.idUser])

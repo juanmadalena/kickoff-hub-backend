@@ -6,7 +6,6 @@ export class CancelMatchDto {
 
     static create(props: { [key: string]: any }): [string?, CancelMatchDto?] {
         const { idMatch, idUser } = props
-
         // Id Match
         if (!idMatch) return ['Id Match is required']
 

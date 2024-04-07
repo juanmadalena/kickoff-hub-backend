@@ -15,12 +15,12 @@ export class MatchRoutes{
         router.get('/', controller.getMatches)
         router.post('/', controller.createMatch)
         router.put('/', controller.updateMatch)
-        router.delete('/', controller.cancelMatch)
         
         router.get('/played', controller.getMatchesPlayed)
         router.get('/organized', controller.getMatchesOrganized)
         
         router.get('/:id', controller.getMatch)
+        router.delete('/:id', controller.cancelMatch)
 
         router.get('/:id/players', controller.getPlayersByMatch)
         router.get('/:id/playersToRate', controller.getPlayersToRate)
