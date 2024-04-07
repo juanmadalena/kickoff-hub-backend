@@ -109,7 +109,7 @@ export class MatchService {
         const db = await dbConnection
 
         const { rows: matches } = await db.query(`
-        select id, date, time, duration, location, address, num_players, min_players, max_players, price from info_matches 
+        select id, date, time, duration, location, address, num_players, min_players, max_players, price, is_canceled from info_matches 
         where id_organizer = $1 order by date, time asc
         `, [idUser])
 
