@@ -33,7 +33,7 @@ export class MatchService {
 
         // Get match
         const { rows: [match] } = await db.query(
-            `select a.id, date, time, location, address, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name, photo from 
+            `select a.id, date, time, location, address, description, latitude, longitude, duration, num_players, min_players, max_players, price, is_private, is_canceled, id_organizer, first_name, last_name, photo from 
                 (
                     select id, date, time, location, address, latitude, longitude, duration, description, num_players, min_players, max_players, price, id_organizer, is_private, is_canceled
                     from info_matches where id = $1
