@@ -11,15 +11,25 @@ export class MatchRoutes{
         const service = new MatchService()
         const controller = new MatchController(service)
 
+        
         router.get('/', controller.getMatches)
-        router.get('/:id', controller.getMatch)
         router.post('/', controller.createMatch)
         router.put('/', controller.updateMatch)
-        router.delete('/', controller.cancelMatch)
         
+        router.get('/played', controller.getMatchesPlayed)
+        router.get('/organized', controller.getMatchesOrganized)
+        
+        router.get('/:id', controller.getMatch)
+        router.delete('/:id', controller.cancelMatch)
+
         router.get('/:id/players', controller.getPlayersByMatch)
+        router.get('/:id/playersToRate', controller.getPlayersToRate)
+        router.post('/:id/ratePlayer', controller.rateUser)
+
         router.post('/:id/join', controller.joinMatch)
         router.post('/:id/leave', controller.leaveMatch)
+        router.post('/:id/remove', controller.removePlayer)
+
 
         return router
     }

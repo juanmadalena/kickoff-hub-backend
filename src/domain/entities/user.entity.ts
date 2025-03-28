@@ -31,12 +31,12 @@ export class UserEntity {
     }
 
     static getOrganizerFromObject(object: { [key: string]: any }): UserEntity {
-        const { id, first_name, last_name, photo } = object
+        const { id_organizer, first_name, last_name, photo } = object
 
-        if (!id) throw CustomErrors.badRequest('Invalid id')
+        if (!id_organizer) throw CustomErrors.badRequest('Invalid id')
         if (!first_name) throw CustomErrors.badRequest('First name is required')
         if (!last_name) throw CustomErrors.badRequest('Last name is required')
 
-        return new UserEntity(id, first_name, last_name, undefined, undefined, photo)
+        return new UserEntity(id_organizer, first_name, last_name, undefined, undefined, photo)
     }
 }

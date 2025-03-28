@@ -31,4 +31,8 @@ export const envs = {
 
   CLOUDINARY_API_SECRET: get('CLOUDINARY_API_SECRET').required().asString(),
 
+  GOOGLE_API_KEY: get('GOOGLE_API_KEY').required().asString(),
+
+  GOOGLE_API_URL: get('GOOGLE_API_URL').required().asString(),
+
 }

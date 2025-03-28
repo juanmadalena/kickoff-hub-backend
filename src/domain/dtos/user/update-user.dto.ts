@@ -1,4 +1,4 @@
-import { Position, regularExps } from "../../../config";
+import { Position } from "../../../config";
 
 export class UpdateUserDto {
 
@@ -8,8 +8,8 @@ export class UpdateUserDto {
         public readonly lastName?: string,
         public readonly position?: Position,
         public readonly secondPosition?: Position[],
-        public readonly email?: string,
-        public readonly password?: string,
+        // public readonly email?: string,
+        // public readonly password?: string,
     ) { }
 
 
@@ -20,14 +20,14 @@ export class UpdateUserDto {
         if (this.lastName) values.lastName = this.lastName
         if (this.position) values.position = this.position
         if (this.secondPosition) values.secondPosition = this.secondPosition
-        if (this.email) values.email = this.email
-        if (this.password) values.password = this.password
+        // if (this.email) values.email = this.email
+        // if (this.password) values.password = this.password
 
         return values
     }
 
     static create(props: { [key: string]: any }): [string?, UpdateUserDto?] {
-        const { id, firstName, lastName, position, secondPosition, email, password } = props
+        const { id, firstName, lastName, position, secondPosition } = props
 
         // Id
         if (!id) return ['Id is required']
@@ -47,12 +47,12 @@ export class UpdateUserDto {
         // }
 
         // Email
-        if (email && !regularExps.email.test(email)) return ['Invalid email']
+        // if (email && !regularExps.email.test(email)) return ['Invalid email']
 
         // Password
-        if (password) return ['Password must be at least 8 characters']
+        // if (password) return ['Password must be at least 8 characters']
 
-        return [undefined, new UpdateUserDto(id, firstName, lastName, position, secondPosition, email, password)]
+        return [undefined, new UpdateUserDto(id, firstName, lastName, position, secondPosition)]
     }
 
 }
